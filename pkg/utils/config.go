@@ -9,15 +9,15 @@ import (
 // Config store all configuration of the application
 // The values are read by viper from a config file or environment variables
 type Config struct {
-	PORT      string `mapstructure:"PORT"`
-	MONGO_URI string `mapstructure:"MONGO_URI"`
+	Port     string `mapstructure:"PORT"`
+	MongoUri string `mapstructure:"MONGO_URI"`
 }
 
-// LoadConfig reads configuration from file or environment variables
-func LoadConfig() (config Config, err error) {
-	err = godotenv.Load(".env")
-	config.PORT = os.Getenv("PORT")
-	config.MONGO_URI = os.Getenv("MONGO_URI")
+var AppConfig Config
 
-	return
+// LoadConfig reads configuration from file or environment variables
+func LoadConfig() {
+	_ = godotenv.Load(".env")
+	AppConfig.Port = os.Getenv("PORT")
+	AppConfig.MongoUri = os.Getenv("MONGO_URI")
 }
