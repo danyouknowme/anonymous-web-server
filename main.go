@@ -3,9 +3,8 @@ package main
 // "log"
 
 import (
-	"log"
-
 	"github.com/danyouknowme/awayfromus/pkg/database"
+	"github.com/danyouknowme/awayfromus/pkg/routes"
 	"github.com/danyouknowme/awayfromus/pkg/utils"
 
 	// "github.com/gin-contrib/cors"
@@ -15,12 +14,11 @@ import (
 func main() {
 	app := gin.Default()
 
-	config, err := utils.LoadConfig()
-	if err != nil {
-		log.Fatal("Cannot load config: ", err)
-	}
+	utils.LoadConfig()
 
-	database.ConnectDB(config.MONGO_URI)
+	database.ConnectDB()
 
-	app.Run(":" + config.PORT)
+	routes.ResourceRoute(app)
+
+	app.Run(":" + utils.AppConfig.Port)
 }
