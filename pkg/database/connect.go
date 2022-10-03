@@ -7,14 +7,15 @@ import (
 	"os"
 	"time"
 
+	"github.com/danyouknowme/awayfromus/pkg/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var DB *mongo.Client
+func ConnectDB() *mongo.Client {
+	utils.LoadConfig()
 
-func ConnectDB(uri string) {
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	client, err := mongo.NewClient(options.Client().ApplyURI(utils.AppConfig.MongoUri))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,8 +29,10 @@ func ConnectDB(uri string) {
 	defer cancel()
 
 	fmt.Println("Connect to MongoDB database successfully!")
-	DB = client
+	return client
 }
+
+var DB *mongo.Client = ConnectDB()
 
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
 	collection := client.Database("awayfromus").Collection(collectionName)
