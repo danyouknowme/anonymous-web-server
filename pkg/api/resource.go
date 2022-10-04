@@ -22,6 +22,15 @@ type AllResourceResponse struct {
 	IsPublish bool         `json:"is_publish"`
 }
 
+// GetResourcesInformation godoc
+// @summary Get Resources
+// @description Get all resource information
+// @tags resouces
+// @id GetResourcesInformation
+// @produce json
+// @response 200 {array} model.Resource "OK"
+// @response 500 {object} model.ErrorResponse "Not Found"
+// @router /api/v1/resources [get]
 func GetAllResourcesInfo() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -31,6 +40,7 @@ func GetAllResourcesInfo() gin.HandlerFunc {
 		results, err := resourceCollection.Find(ctx, bson.M{})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
 		}
 
 		defer results.Close(ctx)
@@ -38,6 +48,7 @@ func GetAllResourcesInfo() gin.HandlerFunc {
 			var resource AllResourceResponse
 			if err = results.Decode(&resource); err != nil {
 				c.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
 			}
 			response = append(response, resource)
 		}

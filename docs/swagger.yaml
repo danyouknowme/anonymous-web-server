@@ -1,0 +1,150 @@
+definitions:
+  model.ErrorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  model.Homepage:
+    properties:
+      description:
+        items:
+          type: string
+        type: array
+      resourceLabel:
+        type: string
+      resourceName:
+        type: string
+      title:
+        type: string
+    type: object
+  model.PatchNote:
+    properties:
+      download:
+        type: string
+      logs:
+        items:
+          type: string
+        type: array
+      version:
+        type: string
+    type: object
+  model.Plan:
+    properties:
+      name:
+        type: string
+      price:
+        type: integer
+    type: object
+  model.Resource:
+    properties:
+      description:
+        type: string
+      document:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      is_publish:
+        type: boolean
+      label:
+        type: string
+      name:
+        type: string
+      patch_notes:
+        items:
+          $ref: '#/definitions/model.PatchNote'
+        type: array
+      plan:
+        items:
+          $ref: '#/definitions/model.Plan'
+        type: array
+      thumbnail:
+        type: string
+      video:
+        type: string
+    type: object
+info:
+  contact:
+    email: thanathip.suw@gmail.com
+    name: Awayfromus Support
+    url: https://discord.com/invite/spqAG3Ktkv
+  description: The Awayfromus web API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: https://awayfromus.dev/terms
+  title: Awayfromus API
+  version: "1.0"
+paths:
+  /api/v1/homepage:
+    get:
+      description: Get homepage information
+      operationId: GetHomepageInformation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Homepage'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get Homepage
+      tags:
+      - homepage
+    patch:
+      consumes:
+      - application/json
+      description: Update homepage information
+      operationId: UpdateHomepageInformation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Homepage'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Homepage
+      tags:
+      - homepage
+  /api/v1/resources:
+    get:
+      description: Get all resource information
+      operationId: GetResourcesInformation
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Resource'
+            type: array
+        "500":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get Resources
+      tags:
+      - resouces
+schemes:
+- http
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
