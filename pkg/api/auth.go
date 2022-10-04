@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"time"
 
@@ -16,19 +17,22 @@ import (
 
 var userCollection *mongo.Collection = database.GetCollection(database.DB, "users")
 
-type CreateUserRequest struct {
-	FirstName string `json:"firstName" binding:"required"`
-	LastName  string `json:"lastName" binding:"required"`
-	Email     string `json:"email" binding:"required"`
-	Phone     string `json:"phone" binding:"required"`
-	Username  string `json:"username" binding:"required,alphanum"`
-	Password  string `json:"password" binding:"required,min=6"`
-}
-
+// CreateUser godoc
+// @summary Create user
+// @description Create user
+// @tags user
+// @id CreateUser
+// @accept json
+// @produce json
+// @param User body model.CreateUserRequest true "User data to be created"
+// @response 200 {object} model.User "OK"
+// @response 400 {object} model.ErrorResponse "Bad Request"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/auth/register [post]
 func CreateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var req CreateUserRequest
+		var req model.CreateUserRequest
 		var user model.User
 		defer cancel()
 
@@ -46,7 +50,8 @@ func CreateUser() gin.HandlerFunc {
 		}
 
 		if user.Username == req.Username {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "This username already use!"})
+			err := errors.New("this username already use")
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
@@ -79,50 +84,24 @@ func CreateUser() gin.HandlerFunc {
 	}
 }
 
-type LoginUserRequest struct {
-	Username string `json:"username" binding:"required,alphanum"`
-	Password string `json:"password" binding:"required,min=6"`
-}
-
-type UserResponse struct {
-	FirstName  string               `json:"firstName"`
-	LastName   string               `json:"lastName"`
-	Email      string               `json:"email"`
-	Phone      string               `json:"phone"`
-	Username   string               `json:"username"`
-	IsAdmin    bool                 `json:"isAdmin"`
-	License    string               `json:"license"`
-	Resources  []model.UserResource `json:"resources"`
-	LastReset  string               `json:"lastReset"`
-	ResetTime  int64                `json:"resetTime"`
-	SecretCode []string             `json:"secretCode"`
-}
-
-type LoginUserResponse struct {
-	AccessToken string       `json:"access_token"`
-	User        UserResponse `json:"user"`
-}
-
-func newUserResponse(user model.User) UserResponse {
-	return UserResponse{
-		FirstName:  user.FirstName,
-		LastName:   user.LastName,
-		Email:      user.Email,
-		Phone:      user.Phone,
-		Username:   user.Username,
-		IsAdmin:    user.IsAdmin,
-		License:    user.License,
-		Resources:  user.Resources,
-		LastReset:  user.LastReset,
-		ResetTime:  user.ResetTime,
-		SecretCode: user.SecretCode,
-	}
-}
-
+// LoginUser godoc
+// @summary Login user
+// @description Login user
+// @tags user
+// @id LoginUser
+// @accept json
+// @produce json
+// @param User body model.LoginUserRequest true "User data to be logged in"
+// @response 200 {object} model.LoginUserResponse "OK"
+// @response 400 {object} model.ErrorResponse "Unauthorized"
+// @response 401 {object} model.ErrorResponse "Bad Request"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/auth/login [post]
 func LoginUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var req LoginUserRequest
+		var req model.LoginUserRequest
 		var user model.User
 		defer cancel()
 
@@ -134,7 +113,8 @@ func LoginUser() gin.HandlerFunc {
 		err := userCollection.FindOne(ctx, bson.M{"username": req.Username}).Decode(&user)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
-				c.JSON(http.StatusNotFound, gin.H{"message": "Not found user with username:" + req.Username})
+				err = errors.New("not found user with username" + req.Username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
 				return
 			}
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
@@ -153,10 +133,26 @@ func LoginUser() gin.HandlerFunc {
 			return
 		}
 
-		response := LoginUserResponse{
+		response := model.LoginUserResponse{
 			AccessToken: accessToken,
 			User:        newUserResponse(user),
 		}
 		c.JSON(http.StatusOK, response)
+	}
+}
+
+func newUserResponse(user model.User) model.UserResponse {
+	return model.UserResponse{
+		FirstName:  user.FirstName,
+		LastName:   user.LastName,
+		Email:      user.Email,
+		Phone:      user.Phone,
+		Username:   user.Username,
+		IsAdmin:    user.IsAdmin,
+		License:    user.License,
+		Resources:  user.Resources,
+		LastReset:  user.LastReset,
+		ResetTime:  user.ResetTime,
+		SecretCode: user.SecretCode,
 	}
 }

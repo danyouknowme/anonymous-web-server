@@ -1,4 +1,27 @@
 definitions:
+  model.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        minLength: 6
+        type: string
+      phone:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - firstName
+    - lastName
+    - password
+    - phone
+    - username
+    type: object
   model.ErrorResponse:
     properties:
       message:
@@ -16,6 +39,24 @@ definitions:
         type: string
       title:
         type: string
+    type: object
+  model.LoginUserRequest:
+    properties:
+      password:
+        minLength: 6
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  model.LoginUserResponse:
+    properties:
+      access_token:
+        type: string
+      user:
+        $ref: '#/definitions/model.UserResponse'
     type: object
   model.PatchNote:
     properties:
@@ -64,6 +105,77 @@ definitions:
       video:
         type: string
     type: object
+  model.User:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      isAdmin:
+        type: boolean
+      lastName:
+        type: string
+      lastReset:
+        type: string
+      license:
+        type: string
+      password:
+        type: string
+      phone:
+        type: string
+      resetTime:
+        type: integer
+      resources:
+        items:
+          $ref: '#/definitions/model.UserResource'
+        type: array
+      secretCode:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
+  model.UserResource:
+    properties:
+      dayLeft:
+        type: integer
+      downloadLink:
+        type: string
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  model.UserResponse:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      isAdmin:
+        type: boolean
+      lastName:
+        type: string
+      lastReset:
+        type: string
+      license:
+        type: string
+      phone:
+        type: string
+      resetTime:
+        type: integer
+      resources:
+        items:
+          $ref: '#/definitions/model.UserResource'
+        type: array
+      secretCode:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
 info:
   contact:
     email: thanathip.suw@gmail.com
@@ -77,6 +189,76 @@ info:
   title: Awayfromus API
   version: "1.0"
 paths:
+  /api/v1/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Login user
+      operationId: LoginUser
+      parameters:
+      - description: User data to be logged in
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.LoginUserResponse'
+        "400":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Login user
+      tags:
+      - user
+  /api/v1/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create user
+      operationId: CreateUser
+      parameters:
+      - description: User data to be created
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Create user
+      tags:
+      - user
   /api/v1/homepage:
     get:
       description: Get homepage information
