@@ -215,7 +215,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "resouces"
+                    "resource"
                 ],
                 "summary": "Get Resources",
                 "operationId": "GetResourcesInformation",
@@ -225,7 +225,7 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/model.Resource"
+                                "$ref": "#/definitions/model.AllResourceResponse"
                             }
                         }
                     },
@@ -236,10 +236,83 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Create a new resource",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resource"
+                ],
+                "summary": "Create new resource",
+                "operationId": "CreateNewResource",
+                "parameters": [
+                    {
+                        "description": "Resource data to be created",
+                        "name": "Resource",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Resource"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Homepage"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
             }
         }
     },
     "definitions": {
+        "model.AllResourceResponse": {
+            "type": "object",
+            "properties": {
+                "is_publish": {
+                    "type": "boolean"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "plan": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Plan"
+                    }
+                },
+                "thumbnail": {
+                    "type": "string"
+                }
+            }
+        },
         "model.CreateUserRequest": {
             "type": "object",
             "required": [
@@ -405,16 +478,16 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstName": {
+                "firstname": {
                     "type": "string"
                 },
-                "isAdmin": {
+                "is_admin": {
                     "type": "boolean"
                 },
-                "lastName": {
+                "last_reset": {
                     "type": "string"
                 },
-                "lastReset": {
+                "lastname": {
                     "type": "string"
                 },
                 "license": {
@@ -426,7 +499,7 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
-                "resetTime": {
+                "reset_time": {
                     "type": "integer"
                 },
                 "resources": {
@@ -435,7 +508,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/model.UserResource"
                     }
                 },
-                "secretCode": {
+                "secret_code": {
                     "type": "array",
                     "items": {
                         "type": "string"
