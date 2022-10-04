@@ -22,3 +22,11 @@ type LoginUserResponse struct {
 	AccessToken string       `json:"access_token"`
 	User        UserResponse `json:"user"`
 }
+
+type AllResourceResponse struct {
+	Name      string `json:"name"`
+	Label     string `json:"label"`
+	Thumbnail string `json:"thumbnail"`
+	Plan      []Plan `json:"plan"`
+	IsPublish bool   `json:"is_publish"`
+}

@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/danyouknowme/awayfromus/pkg/database"
 	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/danyouknowme/awayfromus/pkg/token"
 	"github.com/danyouknowme/awayfromus/pkg/util"
@@ -14,8 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-var userCollection *mongo.Collection = database.GetCollection(database.DB, "users")
 
 // CreateUser godoc
 // @summary Create user

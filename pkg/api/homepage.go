@@ -5,16 +5,10 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/danyouknowme/awayfromus/pkg/database"
 	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
-
-var homepageCollection *mongo.Collection = database.GetCollection(database.DB, "homepage")
-var validate = validator.New()
 
 // GetHomepageInformation godoc
 // @summary Get Homepage
