@@ -1,4 +1,4 @@
-package models
+package model
 
 type Resource struct {
 	IsPublish   bool        `json:"is_publish"`

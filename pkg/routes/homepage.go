@@ -5,7 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HomepageRoute(router *gin.Engine) {
-	router.GET("/homepage", api.GetHomepageInformation())
-	router.PATCH("/homepage", api.UpdateHomepageInformation())
+func HomepageRoute(version *gin.RouterGroup) {
+	homepage := version.Group("/homepage")
+	{
+		homepage.GET("", api.GetHomepageInformation())
+		homepage.PATCH("", api.UpdateHomepageInformation())
+	}
 }

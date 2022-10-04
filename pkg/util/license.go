@@ -1,4 +1,4 @@
-package utils
+package util
 
 func GenerateLicense(username string) string {
 	license := username

@@ -7,15 +7,15 @@ import (
 	"os"
 	"time"
 
-	"github.com/danyouknowme/awayfromus/pkg/utils"
+	"github.com/danyouknowme/awayfromus/pkg/util"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func ConnectDB() *mongo.Client {
-	utils.LoadConfig()
+	util.LoadConfig()
 
-	client, err := mongo.NewClient(options.Client().ApplyURI(utils.AppConfig.MongoUri))
+	client, err := mongo.NewClient(options.Client().ApplyURI(util.AppConfig.MongoUri))
 	if err != nil {
 		log.Fatal(err)
 	}

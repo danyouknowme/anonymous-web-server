@@ -5,6 +5,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func ResourceRoute(router *gin.Engine) {
-	router.GET("/resources", api.GetAllResourcesInfo())
+func ResourceRoute(version *gin.RouterGroup) {
+	resources := version.Group("/resources")
+	{
+		resources.GET("", api.GetAllResourcesInfo())
+	}
 }

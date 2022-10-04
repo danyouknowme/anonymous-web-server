@@ -1,7 +1,12 @@
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/danyouknowme/awayfromus/pkg/model"
+)
 
-func errorResponse(err error) gin.H {
-	return gin.H{"error": err.Error()}
+func errorResponse(err error) model.ErrorResponse {
+	error := model.ErrorResponse{
+		Message: err.Error(),
+	}
+	return error
 }

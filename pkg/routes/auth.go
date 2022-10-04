@@ -5,7 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthRoute(router *gin.Engine) {
-	router.POST("/register", api.CreateUser())
-	router.POST("/login", api.LoginUser())
+func AuthRoute(version *gin.RouterGroup) {
+	auth := version.Group("/auth")
+	{
+		auth.POST("/register", api.CreateUser())
+		auth.POST("/login", api.LoginUser())
+	}
 }
