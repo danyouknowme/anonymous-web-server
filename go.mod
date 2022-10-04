@@ -4,7 +4,8 @@ go 1.16
 
 require (
 	github.com/gin-gonic/gin v1.8.1
-	github.com/go-playground/validator/v10 v10.11.1 // indirect
+	github.com/go-playground/validator/v10 v10.11.1
 	github.com/joho/godotenv v1.4.0
 	go.mongodb.org/mongo-driver v1.10.2
+	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 )
