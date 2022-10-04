@@ -163,3 +163,25 @@ func UpdateResource() gin.HandlerFunc {
 		c.JSON(http.StatusOK, resourceUpdated)
 	}
 }
+
+func GetResourceByName() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var resource model.GetResourceByNameResponse
+		resourceName := c.Param("resourceName")
+		defer cancel()
+
+		err := resourceCollection.FindOne(ctx, bson.M{"name": resourceName}).Decode(&resource)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found resource: " + resourceName)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, resource)
+	}
+}

@@ -30,3 +30,21 @@ type AllResourceResponse struct {
 	Plan      []Plan `json:"plan"`
 	IsPublish bool   `json:"is_publish"`
 }
+
+type GetResourceByNameResponse struct {
+	IsPublish   bool                          `json:"is_publish" bson:"is_publish"`
+	Name        string                        `json:"name" bson:"name"`
+	Label       string                        `json:"label" bson:"label"`
+	Description string                        `json:"description" bson:"description"`
+	Document    string                        `json:"document" bson:"document"`
+	Video       string                        `json:"video" bson:"video"`
+	Thumbnail   string                        `json:"thumbnail" bson:"thumbnail"`
+	Images      []string                      `json:"images" bson:"images"`
+	Plan        []Plan                        `json:"plan" bson:"plan"`
+	PatchNotes  []GetResourceByNamePatchNotes `json:"patch_notes" bson:"patch_notes"`
+}
+
+type GetResourceByNamePatchNotes struct {
+	Version string   `json:"version" bson:"version"`
+	Logs    []string `json:"logs" bson:"logs"`
+}
