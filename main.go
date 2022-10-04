@@ -19,6 +19,7 @@ func main() {
 	database.ConnectDB()
 
 	routes.ResourceRoute(app)
+	routes.HomepageRoute(app)
 
 	app.Run(":" + utils.AppConfig.Port)
 }
