@@ -1,16 +1,16 @@
 package model
 
 type Resource struct {
-	IsPublish   bool        `json:"is_publish"`
-	Name        string      `json:"name"`
-	Label       string      `json:"label"`
-	Description string      `json:"description"`
-	Document    string      `json:"document"`
-	Video       string      `json:"video"`
-	Thumbnail   string      `json:"thumbnail"`
-	Images      []string    `json:"images"`
-	Plan        []Plan      `json:"plan"`
-	PatchNotes  []PatchNote `json:"patch_notes"`
+	IsPublish   bool        `json:"is_publish" bson:"is_publish"`
+	Name        string      `json:"name" bson:"name"`
+	Label       string      `json:"label" bson:"label"`
+	Description string      `json:"description" bson:"description"`
+	Document    string      `json:"document" bson:"document"`
+	Video       string      `json:"video" bson:"video"`
+	Thumbnail   string      `json:"thumbnail" bson:"thumbnail"`
+	Images      []string    `json:"images" bson:"images"`
+	Plan        []Plan      `json:"plan" bson:"plan"`
+	PatchNotes  []PatchNote `json:"patch_notes" bson:"patch_notes"`
 }
 
 type Plan struct {
