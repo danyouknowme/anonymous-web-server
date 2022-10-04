@@ -165,6 +165,17 @@ func UpdateResource() gin.HandlerFunc {
 	}
 }
 
+// GetResourceByName godoc
+// @summary Get resource by name
+// @description Get resource information by resoure name
+// @tags resource
+// @id GetResourceByName
+// @produce json
+// @param resourceName path string true "Resource name that need to get information"
+// @response 200 {object} model.GetResourceByNameResponse "OK"
+// @response 404 {object} model.ErrorResponse "Bad Request"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/resources/{resourceName} [get]
 func GetResourceByName() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -187,6 +198,18 @@ func GetResourceByName() gin.HandlerFunc {
 	}
 }
 
+// GetResourceByNameAndRequiredAdmin godoc
+// @summary Get resource by name required admin
+// @description Get resource information by resoure name and require admin
+// @tags resource
+// @security ApiKeyAuth
+// @id GetResourceByNameAndRequiredAdmin
+// @produce json
+// @param resourceName path string true "Resource name that need to get information"
+// @response 200 {object} model.Resource "OK"
+// @response 404 {object} model.ErrorResponse "Bad Request"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/resources/admin/{resourceName} [get]
 func GetResourceByNameAndRequiredAdmin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -209,6 +232,19 @@ func GetResourceByNameAndRequiredAdmin() gin.HandlerFunc {
 	}
 }
 
+// GetDownloadResource godoc
+// @summary Get download resource
+// @description Get download resource by resoure name
+// @tags resource
+// @security ApiKeyAuth
+// @id GetDownloadResource
+// @produce json
+// @param resourceName path string true "Resource name that need to get download"
+// @response 200 {array} model.GetDownloadResourceResponse "OK"
+// @response 401 {object} model.ErrorResponse "Unauthorized"
+// @response 404 {object} model.ErrorResponse "Bad Request"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/resources/download/{resourceName} [get]
 func GetDownloadResource() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

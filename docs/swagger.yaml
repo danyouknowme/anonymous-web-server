@@ -42,6 +42,51 @@ definitions:
       message:
         type: string
     type: object
+  model.GetDownloadResourceResponse:
+    properties:
+      download:
+        type: string
+      version:
+        type: string
+    type: object
+  model.GetResourceByNamePatchNotes:
+    properties:
+      logs:
+        items:
+          type: string
+        type: array
+      version:
+        type: string
+    type: object
+  model.GetResourceByNameResponse:
+    properties:
+      description:
+        type: string
+      document:
+        type: string
+      images:
+        items:
+          type: string
+        type: array
+      is_publish:
+        type: boolean
+      label:
+        type: string
+      name:
+        type: string
+      patch_notes:
+        items:
+          $ref: '#/definitions/model.GetResourceByNamePatchNotes'
+        type: array
+      plan:
+        items:
+          $ref: '#/definitions/model.Plan'
+        type: array
+      thumbnail:
+        type: string
+      video:
+        type: string
+    type: object
   model.Homepage:
     properties:
       description:
@@ -406,6 +451,100 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Create new resource
+      tags:
+      - resource
+  /api/v1/resources/{resourceName}:
+    get:
+      description: Get resource information by resoure name
+      operationId: GetResourceByName
+      parameters:
+      - description: Resource name that need to get information
+        in: path
+        name: resourceName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GetResourceByNameResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get resource by name
+      tags:
+      - resource
+  /api/v1/resources/admin/{resourceName}:
+    get:
+      description: Get resource information by resoure name and require admin
+      operationId: GetResourceByNameAndRequiredAdmin
+      parameters:
+      - description: Resource name that need to get information
+        in: path
+        name: resourceName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Resource'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get resource by name required admin
+      tags:
+      - resource
+  /api/v1/resources/download/{resourceName}:
+    get:
+      description: Get download resource by resoure name
+      operationId: GetDownloadResource
+      parameters:
+      - description: Resource name that need to get download
+        in: path
+        name: resourceName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.GetDownloadResourceResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get download resource
       tags:
       - resource
 schemes:
