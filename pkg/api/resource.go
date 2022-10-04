@@ -55,7 +55,7 @@ func GetAllResourcesInfo() gin.HandlerFunc {
 // @accept json
 // @produce json
 // @param Resource body model.Resource true "Resource data to be created"
-// @response 201 {object} model.Homepage "Created"
+// @response 201 {object} model.Resource "Created"
 // @response 400 {object} model.ErrorResponse "Bad Request"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"
 // @router /api/v1/resources [post]
@@ -110,5 +110,56 @@ func CreateNewResource() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusCreated, newResource)
+	}
+}
+
+// UpdateResource godoc
+// @summary Update resource
+// @description Update resource information
+// @tags resource
+// @security ApiKeyAuth
+// @id UpdateResource
+// @accept json
+// @produce json
+// @param Resource body model.Resource true "Resource data to be updated"
+// @response 200 {object} model.Resource "OK"
+// @response 400 {object} model.ErrorResponse "Bad Request"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/resources [patch]
+func UpdateResource() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var req model.Resource
+		defer cancel()
+
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		if validationErr := validate.Struct(&req); validationErr != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(validationErr))
+			return
+		}
+
+		resourceUpdated := bson.M{
+			"is_publish":  req.IsPublish,
+			"name":        req.Name,
+			"label":       req.Label,
+			"description": req.Description,
+			"document":    req.Document,
+			"video":       req.Video,
+			"thumbnail":   req.Thumbnail,
+			"images":      req.Images,
+			"plan":        req.Plan,
+			"patch_notes": req.PatchNotes,
+		}
+		result := resourceCollection.FindOneAndUpdate(ctx, bson.M{"name": req.Name}, bson.M{"$set": resourceUpdated})
+		if result.Err() != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(result.Err()))
+			return
+		}
+
+		c.JSON(http.StatusOK, resourceUpdated)
 	}
 }

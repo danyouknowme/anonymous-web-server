@@ -11,4 +11,5 @@ func ResourceRoute(version *gin.RouterGroup) {
 
 	authAndAdminResources := resources.Use(api.AuthAndAdminMiddleWare())
 	authAndAdminResources.POST("", api.CreateNewResource())
+	authAndAdminResources.PATCH("", api.UpdateResource())
 }
