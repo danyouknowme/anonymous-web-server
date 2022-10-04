@@ -110,7 +110,7 @@ func LoginUser() gin.HandlerFunc {
 		err := userCollection.FindOne(ctx, bson.M{"username": req.Username}).Decode(&user)
 		if err != nil {
 			if err == mongo.ErrNoDocuments {
-				err = errors.New("not found user with username" + req.Username)
+				err = errors.New("not found user with username: " + req.Username)
 				c.JSON(http.StatusNotFound, errorResponse(err))
 				return
 			}
