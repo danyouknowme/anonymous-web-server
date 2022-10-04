@@ -282,6 +282,13 @@ paths:
       - application/json
       description: Update homepage information
       operationId: UpdateHomepageInformation
+      parameters:
+      - description: Homepage data to be updated
+        in: body
+        name: Homepage
+        required: true
+        schema:
+          $ref: '#/definitions/model.Homepage'
       produces:
       - application/json
       responses:

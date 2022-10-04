@@ -49,6 +49,7 @@ func GetHomepageInformation() gin.HandlerFunc {
 // @id UpdateHomepageInformation
 // @accept json
 // @produce json
+// @param Homepage body model.Homepage true "Homepage data to be updated"
 // @response 200 {object} model.Homepage "OK"
 // @response 400 {object} model.ErrorResponse "Bad Request"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"

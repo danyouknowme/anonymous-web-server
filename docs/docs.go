@@ -175,6 +175,17 @@ const docTemplate = `{
                 ],
                 "summary": "Update Homepage",
                 "operationId": "UpdateHomepageInformation",
+                "parameters": [
+                    {
+                        "description": "Homepage data to be updated",
+                        "name": "Homepage",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Homepage"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
