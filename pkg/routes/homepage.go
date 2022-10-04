@@ -7,4 +7,5 @@ import (
 
 func HomepageRoute(router *gin.Engine) {
 	router.GET("/homepage", api.GetHomepageInformation())
+	router.PATCH("/homepage", api.UpdateHomepageInformation())
 }
