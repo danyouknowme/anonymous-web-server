@@ -30,14 +30,14 @@ func GetAllResourcesInfo() gin.HandlerFunc {
 
 		results, err := resourceCollection.Find(ctx, bson.M{})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
 		}
 
 		defer results.Close(ctx)
 		for results.Next(ctx) {
 			var resource AllResourceResponse
 			if err = results.Decode(&resource); err != nil {
-				c.JSON(http.StatusInternalServerError, err.Error())
+				c.JSON(http.StatusInternalServerError, errorResponse(err))
 			}
 			response = append(response, resource)
 		}

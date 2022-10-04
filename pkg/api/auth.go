@@ -33,14 +33,14 @@ func CreateUser() gin.HandlerFunc {
 		defer cancel()
 
 		if err := c.BindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
 
 		err := userCollection.FindOne(ctx, bson.M{"username": req.Username}).Decode(&user)
 		if err != nil {
 			if err != mongo.ErrNoDocuments {
-				c.JSON(http.StatusInternalServerError, err.Error())
+				c.JSON(http.StatusInternalServerError, errorResponse(err))
 				return
 			}
 		}
@@ -52,7 +52,7 @@ func CreateUser() gin.HandlerFunc {
 
 		hashedPassword, err := utils.HashPassword(req.Password)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
 
@@ -71,7 +71,7 @@ func CreateUser() gin.HandlerFunc {
 		}
 		_, err = userCollection.InsertOne(ctx, newUser)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
@@ -127,7 +127,7 @@ func LoginUser() gin.HandlerFunc {
 		defer cancel()
 
 		if err := c.BindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
 
@@ -137,19 +137,19 @@ func LoginUser() gin.HandlerFunc {
 				c.JSON(http.StatusNotFound, gin.H{"message": "Not found user with username:" + req.Username})
 				return
 			}
-			c.JSON(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
 		err = utils.CheckPassword(req.Password, user.Password)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, err.Error())
+			c.JSON(http.StatusUnauthorized, errorResponse(err))
 			return
 		}
 
 		accessToken, err := token.CreateToken(req.Username, 24*time.Hour)
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 

@@ -25,7 +25,7 @@ func GetHomepageInformation() gin.HandlerFunc {
 
 		err := homepageCollection.FindOne(ctx, bson.M{}).Decode(&homepageInfo)
 		if err != nil {
-			c.JSON(http.StatusNotFound, err.Error())
+			c.JSON(http.StatusNotFound, errorResponse(err))
 			return
 		}
 
@@ -42,12 +42,12 @@ func UpdateHomepageInformation() gin.HandlerFunc {
 		defer cancel()
 
 		if err := c.BindJSON(&req); err != nil {
-			c.JSON(http.StatusBadRequest, err.Error())
+			c.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
 
 		if validationErr := validate.Struct(&req); validationErr != nil {
-			c.JSON(http.StatusBadRequest, validationErr.Error())
+			c.JSON(http.StatusBadRequest, errorResponse(validationErr))
 			return
 		}
 
@@ -59,7 +59,7 @@ func UpdateHomepageInformation() gin.HandlerFunc {
 		}
 		_, err := homepageCollection.UpdateOne(ctx, bson.M{}, bson.M{"$set": homepageUpdated})
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, err.Error())
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
 
