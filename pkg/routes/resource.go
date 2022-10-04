@@ -7,7 +7,8 @@ import (
 
 func ResourceRoute(version *gin.RouterGroup) {
 	resources := version.Group("/resources")
-	{
-		resources.GET("", api.GetAllResourcesInfo())
-	}
+	resources.GET("", api.GetAllResourcesInfo())
+
+	authAndAdminResources := resources.Use(api.AuthAndAdminMiddleWare())
+	authAndAdminResources.POST("", api.CreateNewResource())
 }
