@@ -7,8 +7,8 @@ import (
 
 func HomepageRoute(version *gin.RouterGroup) {
 	homepage := version.Group("/homepage")
-	{
-		homepage.GET("", api.GetHomepageInformation())
-		homepage.PATCH("", api.UpdateHomepageInformation())
-	}
+	homepage.GET("", api.GetHomepageInformation())
+
+	authAndAdminHomepage := homepage.Use(api.AuthAndAdminMiddleWare())
+	authAndAdminHomepage.PATCH("", api.UpdateHomepageInformation())
 }
