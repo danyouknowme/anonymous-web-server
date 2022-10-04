@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/danyouknowme/awayfromus/pkg/database"
-	"github.com/danyouknowme/awayfromus/pkg/models"
+	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go.mongodb.org/mongo-driver/bson"
@@ -20,7 +20,7 @@ var validate = validator.New()
 func GetHomepageInformation() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var homepageInfo models.Homepage
+		var homepageInfo model.Homepage
 		defer cancel()
 
 		err := homepageCollection.FindOne(ctx, bson.M{}).Decode(&homepageInfo)
@@ -38,7 +38,7 @@ func GetHomepageInformation() gin.HandlerFunc {
 func UpdateHomepageInformation() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var req models.Homepage
+		var req model.Homepage
 		defer cancel()
 
 		if err := c.BindJSON(&req); err != nil {

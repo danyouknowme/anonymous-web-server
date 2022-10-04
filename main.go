@@ -5,7 +5,7 @@ package main
 import (
 	"github.com/danyouknowme/awayfromus/pkg/database"
 	"github.com/danyouknowme/awayfromus/pkg/routes"
-	"github.com/danyouknowme/awayfromus/pkg/utils"
+	"github.com/danyouknowme/awayfromus/pkg/util"
 
 	// "github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -14,7 +14,7 @@ import (
 func main() {
 	app := gin.Default()
 
-	utils.LoadConfig()
+	util.LoadConfig()
 
 	database.ConnectDB()
 
@@ -22,5 +22,5 @@ func main() {
 	routes.HomepageRoute(app)
 	routes.AuthRoute(app)
 
-	app.Run(":" + utils.AppConfig.Port)
+	app.Run(":" + util.AppConfig.Port)
 }

@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/danyouknowme/awayfromus/pkg/database"
-	"github.com/danyouknowme/awayfromus/pkg/models"
+	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,11 +15,11 @@ import (
 var resourceCollection *mongo.Collection = database.GetCollection(database.DB, "resources")
 
 type AllResourceResponse struct {
-	Name      string        `json:"name"`
-	Label     string        `json:"label"`
-	Thumbnail string        `json:"thumbnail"`
-	Plan      []models.Plan `json:"plan"`
-	IsPublish bool          `json:"is_publish"`
+	Name      string       `json:"name"`
+	Label     string       `json:"label"`
+	Thumbnail string       `json:"thumbnail"`
+	Plan      []model.Plan `json:"plan"`
+	IsPublish bool         `json:"is_publish"`
 }
 
 func GetAllResourcesInfo() gin.HandlerFunc {

@@ -6,9 +6,9 @@ import (
 	"time"
 
 	"github.com/danyouknowme/awayfromus/pkg/database"
-	"github.com/danyouknowme/awayfromus/pkg/models"
+	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/danyouknowme/awayfromus/pkg/token"
-	"github.com/danyouknowme/awayfromus/pkg/utils"
+	"github.com/danyouknowme/awayfromus/pkg/util"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -29,7 +29,7 @@ func CreateUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var req CreateUserRequest
-		var user models.User
+		var user model.User
 		defer cancel()
 
 		if err := c.BindJSON(&req); err != nil {
@@ -50,24 +50,24 @@ func CreateUser() gin.HandlerFunc {
 			return
 		}
 
-		hashedPassword, err := utils.HashPassword(req.Password)
+		hashedPassword, err := util.HashPassword(req.Password)
 		if err != nil {
 			c.JSON(http.StatusBadRequest, errorResponse(err))
 			return
 		}
 
-		newUser := models.User{
+		newUser := model.User{
 			FirstName:  req.FirstName,
 			LastName:   req.LastName,
 			Email:      req.Email,
 			Phone:      req.Phone,
 			Username:   req.Username,
 			Password:   hashedPassword,
-			License:    utils.GenerateLicense(req.Username),
-			Resources:  []models.UserResource{},
+			License:    util.GenerateLicense(req.Username),
+			Resources:  []model.UserResource{},
 			LastReset:  time.Now().Format(time.RFC3339),
 			ResetTime:  5,
-			SecretCode: utils.GenerateSecretCode(),
+			SecretCode: util.GenerateSecretCode(),
 		}
 		_, err = userCollection.InsertOne(ctx, newUser)
 		if err != nil {
@@ -85,17 +85,17 @@ type LoginUserRequest struct {
 }
 
 type UserResponse struct {
-	FirstName  string                `json:"firstName"`
-	LastName   string                `json:"lastName"`
-	Email      string                `json:"email"`
-	Phone      string                `json:"phone"`
-	Username   string                `json:"username"`
-	IsAdmin    bool                  `json:"isAdmin"`
-	License    string                `json:"license"`
-	Resources  []models.UserResource `json:"resources"`
-	LastReset  string                `json:"lastReset"`
-	ResetTime  int64                 `json:"resetTime"`
-	SecretCode []string              `json:"secretCode"`
+	FirstName  string               `json:"firstName"`
+	LastName   string               `json:"lastName"`
+	Email      string               `json:"email"`
+	Phone      string               `json:"phone"`
+	Username   string               `json:"username"`
+	IsAdmin    bool                 `json:"isAdmin"`
+	License    string               `json:"license"`
+	Resources  []model.UserResource `json:"resources"`
+	LastReset  string               `json:"lastReset"`
+	ResetTime  int64                `json:"resetTime"`
+	SecretCode []string             `json:"secretCode"`
 }
 
 type LoginUserResponse struct {
@@ -103,7 +103,7 @@ type LoginUserResponse struct {
 	User        UserResponse `json:"user"`
 }
 
-func newUserResponse(user models.User) UserResponse {
+func newUserResponse(user model.User) UserResponse {
 	return UserResponse{
 		FirstName:  user.FirstName,
 		LastName:   user.LastName,
@@ -123,7 +123,7 @@ func LoginUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		var req LoginUserRequest
-		var user models.User
+		var user model.User
 		defer cancel()
 
 		if err := c.BindJSON(&req); err != nil {
@@ -141,7 +141,7 @@ func LoginUser() gin.HandlerFunc {
 			return
 		}
 
-		err = utils.CheckPassword(req.Password, user.Password)
+		err = util.CheckPassword(req.Password, user.Password)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, errorResponse(err))
 			return
