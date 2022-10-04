@@ -344,6 +344,38 @@ paths:
       summary: Get Resources
       tags:
       - resource
+    patch:
+      consumes:
+      - application/json
+      description: Update resource information
+      operationId: UpdateResource
+      parameters:
+      - description: Resource data to be updated
+        in: body
+        name: Resource
+        required: true
+        schema:
+          $ref: '#/definitions/model.Resource'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Resource'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update resource
+      tags:
+      - resource
     post:
       consumes:
       - application/json
@@ -362,7 +394,7 @@ paths:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/model.Homepage'
+            $ref: '#/definitions/model.Resource'
         "400":
           description: Bad Request
           schema:
