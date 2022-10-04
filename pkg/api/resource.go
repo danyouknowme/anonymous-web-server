@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/danyouknowme/awayfromus/pkg/model"
+	"github.com/danyouknowme/awayfromus/pkg/token"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -183,5 +184,79 @@ func GetResourceByName() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, resource)
+	}
+}
+
+func GetResourceByNameAndRequiredAdmin() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var resource model.Resource
+		resourceName := c.Param("resourceName")
+		defer cancel()
+
+		err := resourceCollection.FindOne(ctx, bson.M{"name": resourceName}).Decode(&resource)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found resource: " + resourceName)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, resource)
+	}
+}
+
+func GetDownloadResource() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var resource model.Resource
+		var user model.User
+		var response []model.GetDownloadResourceResponse
+		resourceName := c.Param("resourceName")
+		username := c.MustGet(authorizationPayloadKey).(*token.Payload).Username
+		defer cancel()
+
+		err := userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		err = resourceCollection.FindOne(ctx, bson.M{"name": resourceName}).Decode(&resource)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found resource " + resourceName)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		for _, rs := range user.Resources {
+			if rs.Name == resource.Name {
+				for _, pn := range resource.PatchNotes {
+					downloadResource := model.GetDownloadResourceResponse{
+						Version:  pn.Version,
+						Download: pn.Download,
+					}
+
+					response = append(response, downloadResource)
+				}
+				c.JSON(http.StatusOK, response)
+				return
+			}
+		}
+
+		err = errors.New("unallowed to get download of " + resourceName)
+		c.JSON(http.StatusUnauthorized, errorResponse(err))
 	}
 }

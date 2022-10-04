@@ -48,3 +48,8 @@ type GetResourceByNamePatchNotes struct {
 	Version string   `json:"version" bson:"version"`
 	Logs    []string `json:"logs" bson:"logs"`
 }
+
+type GetDownloadResourceResponse struct {
+	Version  string `json:"version" bson:"version"`
+	Download string `json:"download" bson:"download"`
+}
