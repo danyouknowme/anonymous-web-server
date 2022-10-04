@@ -1,18 +1,18 @@
 package model
 
 type User struct {
-	FirstName  string         `json:"firstName"`
-	LastName   string         `json:"lastName"`
-	Email      string         `json:"email"`
-	Phone      string         `json:"phone"`
-	Username   string         `json:"username"`
-	Password   string         `json:"password"`
-	IsAdmin    bool           `json:"isAdmin"`
-	License    string         `json:"license"`
-	Resources  []UserResource `json:"resources"`
-	LastReset  string         `json:"lastReset"`
-	ResetTime  int64          `json:"resetTime"`
-	SecretCode []string       `json:"secretCode"`
+	FirstName  string         `json:"firstname" bson:"firstname"`
+	LastName   string         `json:"lastname" bson:"lastname"`
+	Email      string         `json:"email" bson:"email"`
+	Phone      string         `json:"phone" bson:"phone"`
+	Username   string         `json:"username" bson:"username"`
+	Password   string         `json:"password" bson:"password"`
+	IsAdmin    bool           `json:"is_admin" bson:"is_admin"`
+	License    string         `json:"license" bson:"license"`
+	Resources  []UserResource `json:"resources" bson:"resources"`
+	LastReset  string         `json:"last_reset" bson:"last_reset"`
+	ResetTime  int64          `json:"reset_time" bson:"reset_time"`
+	SecretCode []string       `json:"secret_code" bson:"secret_code"`
 }
 
 type UserResource struct {
