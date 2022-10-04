@@ -1,4 +1,7 @@
 server:
 	go run main.go
 
-.PHONY: server
+swagger:
+	swag init --md ./
+
+.PHONY: server swagger
