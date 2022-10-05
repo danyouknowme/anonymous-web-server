@@ -19,5 +19,5 @@ func RunCronJobs() {
 		fmt.Println("update dayleft")
 	})
 
-	s.StartBlocking()
+	s.StartAsync()
 }
