@@ -17,4 +17,5 @@ func ResourceRoute(version *gin.RouterGroup) {
 	authAndAdminResources.POST("", api.CreateNewResource())
 	authAndAdminResources.PATCH("", api.UpdateResource())
 	authAndAdminResources.GET("/admin/:resourceName", api.GetResourceByNameAndRequiredAdmin())
+	authAndAdminResources.POST("/user", api.AddResourceToUser())
 }

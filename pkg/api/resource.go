@@ -296,3 +296,61 @@ func GetDownloadResource() gin.HandlerFunc {
 		c.JSON(http.StatusUnauthorized, errorResponse(err))
 	}
 }
+
+func AddResourceToUser() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var req model.AddResourceToUserRequest
+		var resource model.Resource
+		var user model.User
+		defer cancel()
+
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		if validationErr := validate.Struct(&req); validationErr != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(validationErr))
+			return
+		}
+
+		err := userCollection.FindOne(ctx, bson.M{"username": req.Username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + req.Username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+		userResources := user.Resources
+
+		err = resourceCollection.FindOne(ctx, bson.M{"name": req.Resource.Name}).Decode(&resource)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found resource: " + req.Resource.Name)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		newResource := model.UserResource{
+			Name:    req.Resource.Name,
+			DayLeft: req.Resource.DayLeft,
+			Status:  nil,
+		}
+
+		userResources = append(userResources, newResource)
+		result := userCollection.FindOneAndUpdate(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"resources": userResources}})
+		if result.Err() != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(result.Err()))
+			return
+		}
+
+		c.JSON(http.StatusOK, userResources)
+	}
+}
