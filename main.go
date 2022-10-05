@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/danyouknowme/awayfromus/pkg/database"
 	"github.com/danyouknowme/awayfromus/pkg/routes"
+	"github.com/danyouknowme/awayfromus/pkg/time"
 	"github.com/danyouknowme/awayfromus/pkg/util"
 
 	_ "github.com/danyouknowme/awayfromus/docs"
@@ -33,6 +34,7 @@ func main() {
 	app := gin.Default()
 
 	util.LoadConfig()
+	time.RunCronJobs()
 
 	database.ConnectDB()
 
