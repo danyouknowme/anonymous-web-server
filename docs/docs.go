@@ -427,7 +427,68 @@ const docTemplate = `{
                         }
                     },
                     "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/resources/user": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add resource to user and required admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "resource"
+                ],
+                "summary": "Add resource to user",
+                "operationId": "AddResourceToUser",
+                "parameters": [
+                    {
+                        "description": "Username and resource information",
+                        "name": "Resource",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AddResourceToUserRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.UserResource"
+                            }
+                        }
+                    },
+                    "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
                         "schema": {
                             "$ref": "#/definitions/model.ErrorResponse"
                         }
@@ -485,6 +546,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.AddResourceToUserRequest": {
+            "type": "object",
+            "required": [
+                "username"
+            ],
+            "properties": {
+                "resource": {
+                    "$ref": "#/definitions/model.ResourceToUser"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "model.AllResourceResponse": {
             "type": "object",
             "properties": {
@@ -736,6 +811,17 @@ const docTemplate = `{
                 }
             }
         },
+        "model.ResourceToUser": {
+            "type": "object",
+            "properties": {
+                "day_left": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.User": {
             "type": "object",
             "properties": {
@@ -788,9 +874,6 @@ const docTemplate = `{
             "properties": {
                 "dayLeft": {
                     "type": "integer"
-                },
-                "downloadLink": {
-                    "type": "string"
                 },
                 "name": {
                     "type": "string"

@@ -242,7 +242,7 @@ func GetResourceByNameAndRequiredAdmin() gin.HandlerFunc {
 // @param resourceName path string true "Resource name that need to get download"
 // @response 200 {array} model.GetDownloadResourceResponse "OK"
 // @response 401 {object} model.ErrorResponse "Unauthorized"
-// @response 404 {object} model.ErrorResponse "Bad Request"
+// @response 404 {object} model.ErrorResponse "Not Found"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"
 // @router /api/v1/resources/download/{resourceName} [get]
 func GetDownloadResource() gin.HandlerFunc {
@@ -297,6 +297,20 @@ func GetDownloadResource() gin.HandlerFunc {
 	}
 }
 
+// AddResourceToUser godoc
+// @summary Add resource to user
+// @description Add resource to user and required admin
+// @tags resource
+// @security ApiKeyAuth
+// @id AddResourceToUser
+// @accept json
+// @produce json
+// @param Resource body model.AddResourceToUserRequest true "Username and resource information"
+// @response 200 {array} model.UserResource "OK"
+// @response 400 {object} model.ErrorResponse "Bad Request"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/resources/user [post]
 func AddResourceToUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

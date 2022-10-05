@@ -1,4 +1,13 @@
 definitions:
+  model.AddResourceToUserRequest:
+    properties:
+      resource:
+        $ref: '#/definitions/model.ResourceToUser'
+      username:
+        type: string
+    required:
+    - username
+    type: object
   model.AllResourceResponse:
     properties:
       is_publish:
@@ -165,6 +174,13 @@ definitions:
       video:
         type: string
     type: object
+  model.ResourceToUser:
+    properties:
+      day_left:
+        type: integer
+      name:
+        type: string
+    type: object
   model.User:
     properties:
       email:
@@ -200,8 +216,6 @@ definitions:
     properties:
       dayLeft:
         type: integer
-      downloadLink:
-        type: string
       name:
         type: string
       status:
@@ -535,7 +549,7 @@ paths:
           schema:
             $ref: '#/definitions/model.ErrorResponse'
         "404":
-          description: Bad Request
+          description: Not Found
           schema:
             $ref: '#/definitions/model.ErrorResponse'
         "500":
@@ -545,6 +559,45 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get download resource
+      tags:
+      - resource
+  /api/v1/resources/user:
+    post:
+      consumes:
+      - application/json
+      description: Add resource to user and required admin
+      operationId: AddResourceToUser
+      parameters:
+      - description: Username and resource information
+        in: body
+        name: Resource
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddResourceToUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.UserResource'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Add resource to user
       tags:
       - resource
 schemes:
