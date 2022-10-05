@@ -16,7 +16,7 @@ type User struct {
 }
 
 type UserResource struct {
-	Name    string `json:"name"`
-	Status  string `json:"status"`
-	DayLeft int64  `json:"dayLeft"`
+	Name    string  `json:"name"`
+	Status  *string `json:"status"`
+	DayLeft int64   `json:"dayLeft"`
 }
