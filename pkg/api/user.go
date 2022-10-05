@@ -48,13 +48,19 @@ func UpdateUserResourceExpiredDate() error {
 					DayLeft: rs.DayLeft - 1,
 					Status:  rs.Status,
 				}
+			} else {
+				resourceUpdated = model.UserResource{
+					Name:    rs.Name,
+					DayLeft: rs.DayLeft,
+					Status:  rs.Status,
+				}
 			}
 			resources = append(resources, resourceUpdated)
 		}
 
 		result := userCollection.FindOneAndUpdate(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"resources": resources}})
 		if result.Err() != nil {
-			return err
+			return result.Err()
 		}
 	}
 	return nil
