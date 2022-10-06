@@ -45,6 +45,7 @@ func main() {
 	routes.ResourceRoute(v1)
 	routes.HomepageRoute(v1)
 	routes.AuthRoute(v1)
+	routes.DownloadRoute(v1)
 
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
