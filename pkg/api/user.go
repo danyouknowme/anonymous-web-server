@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/danyouknowme/awayfromus/pkg/model"
+	"github.com/danyouknowme/awayfromus/pkg/token"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -138,6 +140,59 @@ func CheckLicense() gin.HandlerFunc {
 				DayLeft: rs.DayLeft,
 			}
 			resources = append(resources, userResource)
+		}
+
+		result := userCollection.FindOneAndUpdate(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"resources": resources}})
+		if result.Err() != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(result.Err()))
+			return
+		}
+		c.JSON(http.StatusOK, resources)
+	}
+}
+
+// ResetIP godoc
+// @summary Reset ip resources
+// @description Reset ip of all user resource status
+// @tags user
+// @id ResetIP
+// @produce json
+// @response 200 {array} model.UserResource "OK"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/user/ip/reset [post]
+func ResetIP() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user model.User
+		var resources []model.UserResource
+		username := c.MustGet(authorizationPayloadKey).(*token.Payload).Username
+		defer cancel()
+
+		err := userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		if user.ResetTime > 0 {
+			err = errors.New("wait for " + strconv.FormatInt(int64(user.ResetTime), 10) + " minutes for reset again")
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		for _, rs := range user.Resources {
+			resource := model.UserResource{
+				Name:    rs.Name,
+				Status:  nil,
+				DayLeft: rs.DayLeft,
+			}
+			resources = append(resources, resource)
 		}
 
 		result := userCollection.FindOneAndUpdate(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"resources": resources}})
