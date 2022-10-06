@@ -2,11 +2,14 @@ package api
 
 import (
 	"context"
+	"errors"
+	"net/http"
 	"time"
 
 	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func VerifyUserAdmin(ctx *gin.Context, username string) (bool, error) {
@@ -64,4 +67,71 @@ func UpdateUserResourceExpiredDate() error {
 		}
 	}
 	return nil
+}
+
+func CheckLicense() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var req model.CheckLicenseRequest
+		var user model.User
+		var resource model.Resource
+		ip := c.ClientIP()
+		defer cancel()
+
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		if validationErr := validate.Struct(&req); validationErr != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(validationErr))
+			return
+		}
+
+		err := userCollection.FindOne(ctx, bson.M{"license": req.License}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with license: " + req.License)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		err = resourceCollection.FindOne(ctx, bson.M{"name": req.ResourceName}).Decode(&resource)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found resource " + req.ResourceName)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		resources := []model.UserResource{}
+
+		for _, rs := range user.Resources {
+			var status *string
+			if rs.Name == resource.Name {
+				status = &ip
+			} else {
+				status = rs.Status
+			}
+			userResource := model.UserResource{
+				Name:    rs.Name,
+				Status:  status,
+				DayLeft: rs.DayLeft,
+			}
+			resources = append(resources, userResource)
+		}
+
+		result := userCollection.FindOneAndUpdate(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"resources": resources}})
+		if result.Err() != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(result.Err()))
+			return
+		}
+		c.JSON(http.StatusOK, resources)
+	}
 }

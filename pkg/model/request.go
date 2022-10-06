@@ -27,3 +27,8 @@ type ResourceToUser struct {
 type DownloadResourceRequest struct {
 	ResourceName string `json:"resource_name"`
 }
+
+type CheckLicenseRequest struct {
+	License      string `json:"license"`
+	ResourceName string `json:"resource_name"`
+}
