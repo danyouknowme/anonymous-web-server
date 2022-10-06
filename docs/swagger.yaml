@@ -23,6 +23,13 @@ definitions:
       thumbnail:
         type: string
     type: object
+  model.CheckLicenseRequest:
+    properties:
+      license:
+        type: string
+      resource_name:
+        type: string
+    type: object
   model.CreateUserRequest:
     properties:
       email:
@@ -45,6 +52,20 @@ definitions:
     - password
     - phone
     - username
+    type: object
+  model.Download:
+    properties:
+      date:
+        type: string
+      resource_name:
+        type: string
+      username:
+        type: string
+    type: object
+  model.DownloadResourceRequest:
+    properties:
+      resource_name:
+        type: string
     type: object
   model.ErrorResponse:
     properties:
@@ -525,6 +546,47 @@ paths:
       summary: Get resource by name required admin
       tags:
       - resource
+  /api/v1/resources/download/:
+    post:
+      consumes:
+      - application/json
+      description: Download resource by resoure name
+      operationId: DownloadResource
+      parameters:
+      - description: Resource name that need to create download
+        in: body
+        name: Download
+        required: true
+        schema:
+          $ref: '#/definitions/model.DownloadResourceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Download'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Download resource
+      tags:
+      - download
   /api/v1/resources/download/{resourceName}:
     get:
       description: Get download resource by resoure name
@@ -560,7 +622,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get download resource
       tags:
-      - resource
+      - download
   /api/v1/resources/user:
     post:
       consumes:
@@ -600,6 +662,43 @@ paths:
       summary: Add resource to user
       tags:
       - resource
+  /api/v1/user/license:
+    post:
+      consumes:
+      - application/json
+      description: Check license and update resource status
+      operationId: CheckLicense
+      parameters:
+      - description: License key and resource name that need to update
+        in: body
+        name: License
+        required: true
+        schema:
+          $ref: '#/definitions/model.CheckLicenseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.UserResource'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Check license
+      tags:
+      - user
 schemes:
 - http
 securityDefinitions:

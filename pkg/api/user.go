@@ -69,6 +69,19 @@ func UpdateUserResourceExpiredDate() error {
 	return nil
 }
 
+// CheckLicense godoc
+// @summary Check license
+// @description Check license and update resource status
+// @tags user
+// @id CheckLicense
+// @accept json
+// @produce json
+// @param License body model.CheckLicenseRequest true "License key and resource name that need to update"
+// @response 200 {array} model.UserResource "OK"
+// @response 400 {object} model.ErrorResponse "Bad Request"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/user/license [post]
 func CheckLicense() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
