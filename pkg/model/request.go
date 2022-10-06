@@ -23,3 +23,7 @@ type ResourceToUser struct {
 	Name    string `json:"name"`
 	DayLeft int64  `json:"day_left"`
 }
+
+type DownloadResourceRequest struct {
+	ResourceName string `json:"resource_name"`
+}
