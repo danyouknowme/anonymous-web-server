@@ -8,6 +8,7 @@ import (
 func UserRoute(version *gin.RouterGroup) {
 	user := version.Group("/users")
 	user.POST("/license", api.CheckLicense())
+	user.POST("/password/forgot", api.ForgotPassword())
 
 	authUsers := user.Use(api.AuthMiddleware())
 	authUsers.POST("/ip/reset", api.ResetIP())

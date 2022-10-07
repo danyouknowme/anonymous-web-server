@@ -10,6 +10,7 @@ import (
 
 	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/danyouknowme/awayfromus/pkg/token"
+	"github.com/danyouknowme/awayfromus/pkg/util"
 	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
 	"go.mongodb.org/mongo-driver/bson"
@@ -453,6 +454,69 @@ func UpdateUserResetTime() gin.HandlerFunc {
 		})
 		s.StartAsync()
 
-		c.JSON(http.StatusOK, messageResponse("ok"))
+		c.JSON(http.StatusOK, messageResponse("start countdown reset time"))
+	}
+}
+
+// ForgotPassword godoc
+// @summary Reset password
+// @description Reset password by secret code
+// @tags users
+// @id ForgotPassword
+// @accept json
+// @produce json
+// @param ForgotPassword body model.ForgotPasswordRequest true "Secret code and new password to reset password"
+// @response 200 {object} model.MessageResponse "OK"
+// @response 400 {object} model.ErrorResponse "Bad Request"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/users/password/forgot [post]
+func ForgotPassword() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var req model.ForgotPasswordRequest
+		var user model.User
+		defer cancel()
+
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(err))
+		}
+
+		if validationErr := validate.Struct(&req); validationErr != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(validationErr))
+			return
+		}
+
+		err := userCollection.FindOne(ctx, bson.M{"username": req.Username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + req.Username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		if !util.Contains(user.SecretCode, req.SecretCode) {
+			err = fmt.Errorf("secret code %s not found on your secret code list", req.SecretCode)
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		remainingSecretCode := util.RemoveSecretCode(user.SecretCode, req.SecretCode)
+		newPassword, err := util.HashPassword(req.NewPassword)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		_, err = userCollection.UpdateOne(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"secret_code": remainingSecretCode, "password": newPassword}})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		c.JSON(http.StatusOK, messageResponse("create you new password successfully"))
 	}
 }

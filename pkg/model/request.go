@@ -42,3 +42,9 @@ type UpdateUserDataRequest struct {
 	License   string         `json:"license" bson:"license"`
 	Resources []UserResource `json:"resources" bson:"resources"`
 }
+
+type ForgotPasswordRequest struct {
+	Username    string `json:"username" bson:"username"`
+	NewPassword string `json:"new_password" bson:"new_password"`
+	SecretCode  string `json:"secret_code" bson:"secret_code"`
+}
