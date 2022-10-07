@@ -13,6 +13,7 @@ var homepageCollection *mongo.Collection = database.GetCollection(database.DB, "
 var userCollection *mongo.Collection = database.GetCollection(database.DB, "users")
 var resourceCollection *mongo.Collection = database.GetCollection(database.DB, "resources")
 var downloadCollection *mongo.Collection = database.GetCollection(database.DB, "downloads")
+var orderCollection *mongo.Collection = database.GetCollection(database.DB, "orders")
 
 func errorResponse(err error) model.ErrorResponse {
 	error := model.ErrorResponse{
