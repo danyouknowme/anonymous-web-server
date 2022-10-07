@@ -74,7 +74,7 @@ func UpdateUserResourceExpiredDate() error {
 // CheckLicense godoc
 // @summary Check license
 // @description Check license and update resource status
-// @tags user
+// @tags users
 // @id CheckLicense
 // @accept json
 // @produce json
@@ -83,7 +83,7 @@ func UpdateUserResourceExpiredDate() error {
 // @response 400 {object} model.ErrorResponse "Bad Request"
 // @response 404 {object} model.ErrorResponse "Not Found"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"
-// @router /api/v1/user/license [post]
+// @router /api/v1/users/license [post]
 func CheckLicense() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -154,13 +154,14 @@ func CheckLicense() gin.HandlerFunc {
 // ResetIP godoc
 // @summary Reset ip resources
 // @description Reset ip of all user resource status
-// @tags user
+// @tags users
+// @security ApiKeyAuth
 // @id ResetIP
 // @produce json
 // @response 200 {array} model.UserResource "OK"
 // @response 404 {object} model.ErrorResponse "Not Found"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"
-// @router /api/v1/user/ip/reset [post]
+// @router /api/v1/users/ip/reset [post]
 func ResetIP() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -201,5 +202,55 @@ func ResetIP() gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, resources)
+	}
+}
+
+// GetUserData godoc
+// @summary Get user data
+// @description Get user data required admin
+// @tags users
+// @security ApiKeyAuth
+// @id GetUserData
+// @produce json
+// @response 200 {object} model.GetUserDataResponse "OK"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/users [get]
+func GetUserData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user model.User
+		username := c.Param("username")
+		defer cancel()
+
+		err := userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		response := model.GetUserDataResponse{
+			FirstName:  user.FirstName,
+			LastName:   user.LastName,
+			Email:      user.Email,
+			Phone:      user.Phone,
+			Username:   user.Username,
+			License:    user.License,
+			Resources:  user.Resources,
+			SecretCode: user.SecretCode,
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}
+
+func UpdateUserData() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
 	}
 }
