@@ -377,3 +377,40 @@ func RemoveUserResource() gin.HandlerFunc {
 		c.JSON(http.StatusOK, userResource)
 	}
 }
+
+// GetAllUsername godoc
+// @summary Get all username
+// @description Get all username require admin
+// @tags users
+// @security ApiKeyAuth
+// @id GetAllUsername
+// @produce json
+// @response 200 {array} string "OK"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/users/usernames [get]
+func GetAllUsername() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var usernames []string
+		defer cancel()
+
+		results, err := userCollection.Find(ctx, bson.M{})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		defer results.Close(ctx)
+		for results.Next(ctx) {
+			var user model.User
+			if err = results.Decode(&user); err != nil {
+				c.JSON(http.StatusInternalServerError, errorResponse(err))
+				return
+			}
+
+			usernames = append(usernames, user.Username)
+		}
+
+		c.JSON(http.StatusOK, usernames)
+	}
+}

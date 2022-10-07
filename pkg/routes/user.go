@@ -16,4 +16,5 @@ func UserRoute(version *gin.RouterGroup) {
 	authAndAdminUsers := user.Use(api.AuthAndAdminMiddleWare())
 	authAndAdminUsers.GET("/:username", api.GetUserData())
 	authAndAdminUsers.PATCH("", api.UpdateUserData())
+	authAndAdminUsers.GET("/usernames", api.GetAllUsername())
 }
