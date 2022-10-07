@@ -74,3 +74,8 @@ type GetUserDataResponse struct {
 	Resources  []UserResource `json:"resources" bson:"resources"`
 	SecretCode []string       `json:"secret_code" bson:"secret_code"`
 }
+
+type GetUserResetTimeResponse struct {
+	Timer    int64 `json:"timer" bson:"timer"`
+	CanReset bool  `json:"can_reset" bson:"can_reset"`
+}

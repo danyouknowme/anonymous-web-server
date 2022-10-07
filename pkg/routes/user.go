@@ -12,6 +12,7 @@ func UserRoute(version *gin.RouterGroup) {
 	authUsers := user.Use(api.AuthMiddleware())
 	authUsers.POST("/ip/reset", api.ResetIP())
 	authUsers.DELETE("/resource/:resourceIndex", api.RemoveUserResource())
+	authUsers.GET("/reset-time", api.GetUserResetTime())
 
 	authAndAdminUsers := user.Use(api.AuthAndAdminMiddleWare())
 	authAndAdminUsers.GET("/:username", api.GetUserData())

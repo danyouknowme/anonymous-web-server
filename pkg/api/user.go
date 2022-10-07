@@ -414,3 +414,41 @@ func GetAllUsername() gin.HandlerFunc {
 		c.JSON(http.StatusOK, usernames)
 	}
 }
+
+// GetUserResetTime godoc
+// @summary Get user reset time
+// @description Get user reset time
+// @tags users
+// @security ApiKeyAuth
+// @id GetUserResetTime
+// @produce json
+// @response 200 {object} model.GetUserResetTimeResponse "OK"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/users/reset-time [get]
+func GetUserResetTime() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user model.User
+		username := c.MustGet(authorizationPayloadKey).(*token.Payload).Username
+		defer cancel()
+
+		err := userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		response := model.GetUserResetTimeResponse{
+			Timer:    user.ResetTime,
+			CanReset: user.ResetTime == 5,
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}
