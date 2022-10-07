@@ -15,9 +15,16 @@ var resourceCollection *mongo.Collection = database.GetCollection(database.DB, "
 var downloadCollection *mongo.Collection = database.GetCollection(database.DB, "downloads")
 var orderCollection *mongo.Collection = database.GetCollection(database.DB, "orders")
 
+func messageResponse(message string) model.MessageResponse {
+	response := model.MessageResponse{
+		Message: message,
+	}
+	return response
+}
+
 func errorResponse(err error) model.ErrorResponse {
 	error := model.ErrorResponse{
-		Message: err.Error(),
+		Error: err.Error(),
 	}
 	return error
 }
