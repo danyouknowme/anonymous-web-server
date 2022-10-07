@@ -69,8 +69,26 @@ definitions:
     type: object
   model.ErrorResponse:
     properties:
-      message:
+      error:
         type: string
+    type: object
+  model.ForgotPasswordRequest:
+    properties:
+      new_password:
+        type: string
+      secret_code:
+        type: string
+      username:
+        type: string
+    type: object
+  model.GetCounterStateResponse:
+    properties:
+      download:
+        type: integer
+      orders:
+        type: integer
+      users:
+        type: integer
     type: object
   model.GetDownloadResourceResponse:
     properties:
@@ -117,6 +135,36 @@ definitions:
       video:
         type: string
     type: object
+  model.GetUserDataResponse:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      license:
+        type: string
+      phone:
+        type: string
+      resources:
+        items:
+          $ref: '#/definitions/model.UserResource'
+        type: array
+      secret_code:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
+  model.GetUserResetTimeResponse:
+    properties:
+      can_reset:
+        type: boolean
+      timer:
+        type: integer
+    type: object
   model.Homepage:
     properties:
       description:
@@ -147,6 +195,11 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/model.UserResponse'
+    type: object
+  model.MessageResponse:
+    properties:
+      message:
+        type: string
     type: object
   model.PatchNote:
     properties:
@@ -200,6 +253,25 @@ definitions:
       day_left:
         type: integer
       name:
+        type: string
+    type: object
+  model.UpdateUserDataRequest:
+    properties:
+      email:
+        type: string
+      firstname:
+        type: string
+      lastname:
+        type: string
+      license:
+        type: string
+      phone:
+        type: string
+      resources:
+        items:
+          $ref: '#/definitions/model.UserResource'
+        type: array
+      username:
         type: string
     type: object
   model.User:
@@ -322,7 +394,7 @@ paths:
             $ref: '#/definitions/model.ErrorResponse'
       summary: Login user
       tags:
-      - user
+      - users
   /api/v1/auth/register:
     post:
       consumes:
@@ -353,7 +425,84 @@ paths:
             $ref: '#/definitions/model.ErrorResponse'
       summary: Create user
       tags:
-      - user
+      - users
+  /api/v1/downloads:
+    post:
+      consumes:
+      - application/json
+      description: Download resource by resoure name
+      operationId: DownloadResource
+      parameters:
+      - description: Resource name that need to create download
+        in: body
+        name: Download
+        required: true
+        schema:
+          $ref: '#/definitions/model.DownloadResourceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Download'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Download resource
+      tags:
+      - downloads
+  /api/v1/downloads/{resourceName}:
+    get:
+      description: Get download resource by resoure name
+      operationId: GetDownloadResource
+      parameters:
+      - description: Resource name that need to get download
+        in: path
+        name: resourceName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.GetDownloadResourceResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get download resource
+      tags:
+      - downloads
   /api/v1/homepage:
     get:
       description: Get homepage information
@@ -402,6 +551,24 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Update Homepage
+      tags:
+      - homepage
+  /api/v1/homepage/counter:
+    get:
+      description: Get counter state information to show on homepage
+      operationId: GetCounterState
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GetCounterStateResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Get counter state
       tags:
       - homepage
   /api/v1/resources:
@@ -546,83 +713,6 @@ paths:
       summary: Get resource by name required admin
       tags:
       - resource
-  /api/v1/resources/download/:
-    post:
-      consumes:
-      - application/json
-      description: Download resource by resoure name
-      operationId: DownloadResource
-      parameters:
-      - description: Resource name that need to create download
-        in: body
-        name: Download
-        required: true
-        schema:
-          $ref: '#/definitions/model.DownloadResourceRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/model.Download'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Download resource
-      tags:
-      - download
-  /api/v1/resources/download/{resourceName}:
-    get:
-      description: Get download resource by resoure name
-      operationId: GetDownloadResource
-      parameters:
-      - description: Resource name that need to get download
-        in: path
-        name: resourceName
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/model.GetDownloadResourceResponse'
-            type: array
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/model.ErrorResponse'
-      security:
-      - ApiKeyAuth: []
-      summary: Get download resource
-      tags:
-      - download
   /api/v1/resources/user:
     post:
       consumes:
@@ -662,7 +752,100 @@ paths:
       summary: Add resource to user
       tags:
       - resource
-  /api/v1/user/license:
+  /api/v1/users:
+    patch:
+      consumes:
+      - application/json
+      description: Update user data required admin
+      operationId: UpdateUserData
+      parameters:
+      - description: User data that will be updated
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateUserDataRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user data
+      tags:
+      - users
+  /api/v1/users/{username}:
+    get:
+      description: Get user data required admin
+      operationId: GetUserData
+      parameters:
+      - description: Username of user that need to update data
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GetUserDataResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user data
+      tags:
+      - users
+  /api/v1/users/ip/reset:
+    post:
+      description: Reset ip of all user resource status
+      operationId: ResetIP
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.UserResource'
+            type: array
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Reset ip resources
+      tags:
+      - users
+  /api/v1/users/license:
     post:
       consumes:
       - application/json
@@ -698,7 +881,147 @@ paths:
             $ref: '#/definitions/model.ErrorResponse'
       summary: Check license
       tags:
-      - user
+      - users
+  /api/v1/users/password/forgot:
+    post:
+      consumes:
+      - application/json
+      description: Reset password by secret code
+      operationId: ForgotPassword
+      parameters:
+      - description: Secret code and new password to reset password
+        in: body
+        name: ForgotPassword
+        required: true
+        schema:
+          $ref: '#/definitions/model.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      summary: Reset password
+      tags:
+      - users
+  /api/v1/users/reset-time:
+    get:
+      description: Get user reset time
+      operationId: GetUserResetTime
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.GetUserResetTimeResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get user reset time
+      tags:
+      - users
+    patch:
+      description: Update user reset time
+      operationId: UpdateUserResetTime
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Update user reset time
+      tags:
+      - users
+  /api/v1/users/resource/{resourceIndex}:
+    delete:
+      description: Remove user resource by index
+      operationId: RemoveUserResource
+      parameters:
+      - description: Index of resource that need to remove
+        in: path
+        name: resourceIndex
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.UserResource'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Remove user resource
+      tags:
+      - users
+  /api/v1/users/usernames:
+    get:
+      description: Get all username require admin
+      operationId: GetAllUsername
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all username
+      tags:
+      - users
 schemes:
 - http
 securityDefinitions:
