@@ -9,17 +9,17 @@ type MessageResponse struct {
 }
 
 type UserResponse struct {
-	FirstName  string         `json:"firstName"`
-	LastName   string         `json:"lastName"`
+	FirstName  string         `json:"firstname"`
+	LastName   string         `json:"lastname"`
 	Email      string         `json:"email"`
 	Phone      string         `json:"phone"`
 	Username   string         `json:"username"`
-	IsAdmin    bool           `json:"isAdmin"`
+	IsAdmin    bool           `json:"is_admin"`
 	License    string         `json:"license"`
 	Resources  []UserResource `json:"resources"`
-	LastReset  string         `json:"lastReset"`
-	ResetTime  int64          `json:"resetTime"`
-	SecretCode []string       `json:"secretCode"`
+	LastReset  string         `json:"last_reset"`
+	ResetTime  int64          `json:"reset_time"`
+	SecretCode []string       `json:"secret_code"`
 }
 
 type LoginUserResponse struct {
