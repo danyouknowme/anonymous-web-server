@@ -79,3 +79,45 @@ func UpdateHomepageInformation() gin.HandlerFunc {
 		c.JSON(http.StatusOK, homepageUpdated)
 	}
 }
+
+// GetCounterState godoc
+// @summary Get counter state
+// @description Get counter state information to show on homepage
+// @tags homepage
+// @id GetCounterState
+// @produce json
+// @response 200 {object} model.GetCounterStateResponse "OK"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/homepage/counter [get]
+func GetCounterState() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+
+		userCount, err := userCollection.CountDocuments(ctx, bson.M{})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		downloadCount, err := downloadCollection.CountDocuments(ctx, bson.M{})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		orderCount, err := orderCollection.CountDocuments(ctx, bson.M{})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		response := model.GetCounterStateResponse{
+			Users:     userCount,
+			Downloads: downloadCount,
+			Orders:    orderCount,
+		}
+
+		c.JSON(http.StatusOK, response)
+	}
+}

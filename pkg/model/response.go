@@ -53,3 +53,9 @@ type GetDownloadResourceResponse struct {
 	Version  string `json:"version" bson:"version"`
 	Download string `json:"download" bson:"download"`
 }
+
+type GetCounterStateResponse struct {
+	Downloads int64 `json:"download" bson:"download"`
+	Users     int64 `json:"users" bson:"users"`
+	Orders    int64 `json:"orders" bson:"orders"`
+}
