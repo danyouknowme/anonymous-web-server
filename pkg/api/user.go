@@ -308,7 +308,7 @@ func UpdateUserData() gin.HandlerFunc {
 			SecretCode: user.SecretCode,
 		}
 
-		_, err = userCollection.UpdateOne(ctx, bson.M{}, bson.M{"$set": updatedUser})
+		_, err = userCollection.UpdateOne(ctx, bson.M{"username": user.Username}, bson.M{"$set": updatedUser})
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
@@ -316,5 +316,64 @@ func UpdateUserData() gin.HandlerFunc {
 
 		message := fmt.Sprintf("%s successfully updated", user.Username)
 		c.JSON(http.StatusOK, messageResponse(message))
+	}
+}
+
+// RemoveUserResource godoc
+// @summary Remove user resource
+// @description Remove user resource by index
+// @tags users
+// @security ApiKeyAuth
+// @id RemoveUserResource
+// @produce json
+// @param resourceIndex path int true "Index of resource that need to remove"
+// @response 200 {array} model.UserResource "OK"
+// @response 400 {object} model.ErrorResponse "Bad Request"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/users/resource/{resourceIndex} [delete]
+func RemoveUserResource() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user model.User
+		var userResource []model.UserResource
+		username := c.MustGet(authorizationPayloadKey).(*token.Payload).Username
+		defer cancel()
+
+		resourceIndex, err := strconv.Atoi(c.Param("resourceIndex"))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		err = userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		for i, rs := range user.Resources {
+			if i != resourceIndex {
+				userResource = append(userResource, rs)
+			} else {
+				if rs.DayLeft > 0 {
+					err = fmt.Errorf("%s still have %d days left", rs.Name, rs.DayLeft)
+					c.JSON(http.StatusBadRequest, errorResponse(err))
+					return
+				}
+			}
+		}
+
+		_, err = userCollection.UpdateOne(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"resources": userResource}})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+		}
+
+		c.JSON(http.StatusOK, userResource)
 	}
 }
