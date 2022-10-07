@@ -8,7 +8,7 @@ import (
 	"github.com/go-co-op/gocron"
 )
 
-func RunCronJobs() {
+func RunUpdateResourceExpiredDate() {
 	s := gocron.NewScheduler(time.UTC)
 
 	s.Every(1).Days().Do(func() {

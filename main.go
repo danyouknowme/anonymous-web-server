@@ -34,7 +34,7 @@ func main() {
 	app := gin.Default()
 
 	util.LoadConfig()
-	time.RunCronJobs()
+	time.RunUpdateResourceExpiredDate()
 
 	database.ConnectDB()
 
