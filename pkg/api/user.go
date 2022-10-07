@@ -126,7 +126,7 @@ func ResetIP() gin.HandlerFunc {
 			return
 		}
 
-		if user.ResetTime > 0 {
+		if user.ResetTime != 5 {
 			err = errors.New("wait for " + strconv.FormatInt(int64(user.ResetTime), 10) + " minutes for reset again")
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
@@ -422,6 +422,12 @@ func UpdateUserResetTime() gin.HandlerFunc {
 				c.JSON(http.StatusNotFound, errorResponse(err))
 				return
 			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		if user.ResetTime != 5 {
+			err = fmt.Errorf("timer is still running wait for %d minute(s)", user.ResetTime)
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return
 		}
