@@ -11,66 +11,10 @@ import (
 	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/danyouknowme/awayfromus/pkg/token"
 	"github.com/gin-gonic/gin"
+	"github.com/go-co-op/gocron"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-func VerifyUserAdmin(ctx *gin.Context, username string) (bool, error) {
-	var user model.User
-	err := userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
-	if err != nil {
-		return false, err
-	}
-
-	if user.IsAdmin {
-		return true, nil
-	}
-	return false, nil
-}
-
-func UpdateUserResourceExpiredDate() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-
-	results, err := userCollection.Find(ctx, bson.M{})
-	if err != nil {
-		return err
-	}
-
-	defer results.Close(ctx)
-	for results.Next(ctx) {
-		var user model.User
-		if err = results.Decode(&user); err != nil {
-			return err
-		}
-
-		resources := []model.UserResource{}
-
-		for _, rs := range user.Resources {
-			resourceUpdated := model.UserResource{}
-			if rs.DayLeft > 0 {
-				resourceUpdated = model.UserResource{
-					Name:    rs.Name,
-					DayLeft: rs.DayLeft - 1,
-					Status:  rs.Status,
-				}
-			} else {
-				resourceUpdated = model.UserResource{
-					Name:    rs.Name,
-					DayLeft: rs.DayLeft,
-					Status:  rs.Status,
-				}
-			}
-			resources = append(resources, resourceUpdated)
-		}
-
-		result := userCollection.FindOneAndUpdate(ctx, bson.M{"username": user.Username}, bson.M{"$set": bson.M{"resources": resources}})
-		if result.Err() != nil {
-			return result.Err()
-		}
-	}
-	return nil
-}
 
 // CheckLicense godoc
 // @summary Check license
@@ -450,5 +394,59 @@ func GetUserResetTime() gin.HandlerFunc {
 		}
 
 		c.JSON(http.StatusOK, response)
+	}
+}
+
+// UpdateUserResetTime godoc
+// @summary Update user reset time
+// @description Update user reset time
+// @tags users
+// @security ApiKeyAuth
+// @id UpdateUserResetTime
+// @produce json
+// @response 200 {object} model.MessageResponse "OK"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/users/reset-time [patch]
+func UpdateUserResetTime() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var user model.User
+		username := c.MustGet(authorizationPayloadKey).(*token.Payload).Username
+		defer cancel()
+
+		err := userCollection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		s := gocron.NewScheduler(time.UTC)
+		s.Every(1).Minutes().Do(func() {
+			if user.ResetTime != 0 {
+				user.ResetTime--
+				err = UpdateUserResetTimeOnMinute(user)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, errorResponse(err))
+					return
+				}
+			} else {
+				user.ResetTime = 5
+				err = UpdateUserResetTimeOnMinute(user)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, errorResponse(err))
+					return
+				}
+				s.Stop()
+			}
+		})
+		s.StartAsync()
+
+		c.JSON(http.StatusOK, messageResponse("ok"))
 	}
 }
