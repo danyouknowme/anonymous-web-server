@@ -32,3 +32,13 @@ type CheckLicenseRequest struct {
 	License      string `json:"license"`
 	ResourceName string `json:"resource_name"`
 }
+
+type UpdateUserDataRequest struct {
+	FirstName string         `json:"firstname" bson:"firstname"`
+	LastName  string         `json:"lastname" bson:"lastname"`
+	Email     string         `json:"email" bson:"email"`
+	Phone     string         `json:"phone" bson:"phone"`
+	Username  string         `json:"username" bson:"username"`
+	License   string         `json:"license" bson:"license"`
+	Resources []UserResource `json:"resources" bson:"resources"`
+}

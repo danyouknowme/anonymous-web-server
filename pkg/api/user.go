@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -212,10 +213,11 @@ func ResetIP() gin.HandlerFunc {
 // @security ApiKeyAuth
 // @id GetUserData
 // @produce json
+// @param username path string true "Username of user that need to update data"
 // @response 200 {object} model.GetUserDataResponse "OK"
 // @response 404 {object} model.ErrorResponse "Not Found"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"
-// @router /api/v1/users [get]
+// @router /api/v1/users/{username} [get]
 func GetUserData() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -249,8 +251,70 @@ func GetUserData() gin.HandlerFunc {
 	}
 }
 
+// UpdateUserData godoc
+// @summary Update user data
+// @description Update user data required admin
+// @tags users
+// @security ApiKeyAuth
+// @id UpdateUserData
+// @accept json
+// @produce json
+// @param User body model.UpdateUserDataRequest true "User data that will be updated"
+// @response 200 {object} model.MessageResponse "OK"
+// @response 400 {object} model.ErrorResponse "Bad Request"
+// @response 404 {object} model.ErrorResponse "Not Found"
+// @response 500 {object} model.ErrorResponse "Internal Server Error"
+// @router /api/v1/users [patch]
 func UpdateUserData() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		var req model.UpdateUserDataRequest
+		var user model.User
+		defer cancel()
 
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(err))
+			return
+		}
+
+		if validationErr := validate.Struct(&req); validationErr != nil {
+			c.JSON(http.StatusBadRequest, errorResponse(validationErr))
+			return
+		}
+
+		err := userCollection.FindOne(ctx, bson.M{"username": req.Username}).Decode(&user)
+		if err != nil {
+			if err == mongo.ErrNoDocuments {
+				err = errors.New("not found user with username: " + req.Username)
+				c.JSON(http.StatusNotFound, errorResponse(err))
+				return
+			}
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		updatedUser := model.User{
+			Username:   user.Username,
+			FirstName:  req.FirstName,
+			LastName:   req.LastName,
+			Email:      req.Email,
+			Phone:      req.Phone,
+			License:    req.License,
+			Resources:  req.Resources,
+			Password:   user.Password,
+			IsAdmin:    user.IsAdmin,
+			LastReset:  time.Now().Format(time.RFC3339),
+			ResetTime:  user.ResetTime,
+			SecretCode: user.SecretCode,
+		}
+
+		_, err = userCollection.UpdateOne(ctx, bson.M{}, bson.M{"$set": updatedUser})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		message := fmt.Sprintf("%s successfully updated", user.Username)
+		c.JSON(http.StatusOK, messageResponse(message))
 	}
 }
