@@ -17,7 +17,7 @@ import (
 // CreateUser godoc
 // @summary Create user
 // @description Create user
-// @tags user
+// @tags users
 // @id CreateUser
 // @accept json
 // @produce json
@@ -84,7 +84,7 @@ func CreateUser() gin.HandlerFunc {
 // LoginUser godoc
 // @summary Login user
 // @description Login user
-// @tags user
+// @tags users
 // @id LoginUser
 // @accept json
 // @produce json
