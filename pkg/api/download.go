@@ -16,7 +16,7 @@ import (
 // GetDownloadResource godoc
 // @summary Get download resource
 // @description Get download resource by resoure name
-// @tags download
+// @tags downloads
 // @security ApiKeyAuth
 // @id GetDownloadResource
 // @produce json
@@ -25,7 +25,7 @@ import (
 // @response 401 {object} model.ErrorResponse "Unauthorized"
 // @response 404 {object} model.ErrorResponse "Not Found"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"
-// @router /api/v1/resources/download/{resourceName} [get]
+// @router /api/v1/downloads/{resourceName} [get]
 func GetDownloadResource() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -81,7 +81,7 @@ func GetDownloadResource() gin.HandlerFunc {
 // DownloadResource godoc
 // @summary Download resource
 // @description Download resource by resoure name
-// @tags download
+// @tags downloads
 // @security ApiKeyAuth
 // @id DownloadResource
 // @accept json
@@ -92,7 +92,7 @@ func GetDownloadResource() gin.HandlerFunc {
 // @response 401 {object} model.ErrorResponse "Unauthorized"
 // @response 404 {object} model.ErrorResponse "Not Found"
 // @response 500 {object} model.ErrorResponse "Internal Server Error"
-// @router /api/v1/resources/download/ [post]
+// @router /api/v1/downloads [post]
 func DownloadResource() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)

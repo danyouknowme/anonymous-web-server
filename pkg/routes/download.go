@@ -6,7 +6,7 @@ import (
 )
 
 func DownloadRoute(version *gin.RouterGroup) {
-	download := version.Group("/download")
+	download := version.Group("/downloads")
 	authDownload := download.Use(api.AuthMiddleware())
 	authDownload.GET("/:resourceName", api.GetDownloadResource())
 	authDownload.POST("", api.DownloadResource())
