@@ -388,6 +388,56 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Add order by requested resource and plan",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Add order",
+                "operationId": "AddOrder",
+                "parameters": [
+                    {
+                        "description": "Order request to be created",
+                        "name": "OrderRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.AddOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.Order"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
             }
         },
         "/api/v1/resources": {
@@ -1092,6 +1142,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.AddOrderRequest": {
+            "type": "object",
+            "properties": {
+                "request_order": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.RequestOrderResource"
+                    }
+                },
+                "transaction_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "model.AddResourceToUserRequest": {
             "type": "object",
             "required": [
@@ -1470,7 +1537,18 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "price": {
-                    "type": "integer"
+                    "type": "number"
+                }
+            }
+        },
+        "model.RequestOrderResource": {
+            "type": "object",
+            "properties": {
+                "plan": {
+                    "type": "string"
+                },
+                "resource": {
+                    "type": "string"
                 }
             }
         },

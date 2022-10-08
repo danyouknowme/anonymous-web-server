@@ -1,4 +1,15 @@
 definitions:
+  model.AddOrderRequest:
+    properties:
+      request_order:
+        items:
+          $ref: '#/definitions/model.RequestOrderResource'
+        type: array
+      transaction_image:
+        type: string
+      username:
+        type: string
+    type: object
   model.AddResourceToUserRequest:
     properties:
       resource:
@@ -247,7 +258,14 @@ definitions:
       name:
         type: string
       price:
-        type: integer
+        type: number
+    type: object
+  model.RequestOrderResource:
+    properties:
+      plan:
+        type: string
+      resource:
+        type: string
     type: object
   model.Resource:
     properties:
@@ -621,6 +639,38 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get all orders
+      tags:
+      - orders
+    post:
+      consumes:
+      - application/json
+      description: Add order by requested resource and plan
+      operationId: AddOrder
+      parameters:
+      - description: Order request to be created
+        in: body
+        name: OrderRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.Order'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Add order
       tags:
       - orders
   /api/v1/resources:
