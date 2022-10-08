@@ -1,6 +1,6 @@
 package model
 
-type Orders struct {
+type Order struct {
 	BillNumber       string          `json:"billno" bson:"billno"`
 	Username         string          `json:"username" bson:"username"`
 	Resources        []OrderResource `json:"resources" bson:"resources"`
