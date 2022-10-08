@@ -201,6 +201,36 @@ definitions:
       message:
         type: string
     type: object
+  model.Order:
+    properties:
+      billno:
+        type: string
+      date:
+        type: string
+      resources:
+        items:
+          $ref: '#/definitions/model.OrderResource'
+        type: array
+      status:
+        type: string
+      total_price:
+        type: number
+      transaction_image:
+        type: string
+      username:
+        type: string
+    type: object
+  model.OrderResource:
+    properties:
+      plan:
+        type: string
+      price:
+        type: number
+      resource_label:
+        type: string
+      resource_name:
+        type: string
+    type: object
   model.PatchNote:
     properties:
       download:
@@ -318,25 +348,25 @@ definitions:
     properties:
       email:
         type: string
-      firstName:
+      firstname:
         type: string
-      isAdmin:
+      is_admin:
         type: boolean
-      lastName:
+      last_reset:
         type: string
-      lastReset:
+      lastname:
         type: string
       license:
         type: string
       phone:
         type: string
-      resetTime:
+      reset_time:
         type: integer
       resources:
         items:
           $ref: '#/definitions/model.UserResource'
         type: array
-      secretCode:
+      secret_code:
         items:
           type: string
         type: array
@@ -571,6 +601,28 @@ paths:
       summary: Get counter state
       tags:
       - homepage
+  /api/v1/orders:
+    get:
+      description: Get all orders require admin
+      operationId: GetAllOrders
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Order'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get all orders
+      tags:
+      - orders
   /api/v1/resources:
     get:
       description: Get all resource information

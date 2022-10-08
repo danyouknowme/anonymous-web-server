@@ -47,6 +47,7 @@ func main() {
 	routes.AuthRoute(v1)
 	routes.DownloadRoute(v1)
 	routes.UserRoute(v1)
+	routes.OrderRoute(v1)
 
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 

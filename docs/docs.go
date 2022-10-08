@@ -355,6 +355,41 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/orders": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get all orders require admin",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get all orders",
+                "operationId": "GetAllOrders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Order"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/resources": {
             "get": {
                 "description": "Get all resource information",
@@ -1365,6 +1400,52 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Order": {
+            "type": "object",
+            "properties": {
+                "billno": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "string"
+                },
+                "resources": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.OrderResource"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "total_price": {
+                    "type": "number"
+                },
+                "transaction_image": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OrderResource": {
+            "type": "object",
+            "properties": {
+                "plan": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "resource_label": {
+                    "type": "string"
+                },
+                "resource_name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.PatchNote": {
             "type": "object",
             "properties": {
@@ -1544,16 +1625,16 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "firstName": {
+                "firstname": {
                     "type": "string"
                 },
-                "isAdmin": {
+                "is_admin": {
                     "type": "boolean"
                 },
-                "lastName": {
+                "last_reset": {
                     "type": "string"
                 },
-                "lastReset": {
+                "lastname": {
                     "type": "string"
                 },
                 "license": {
@@ -1562,7 +1643,7 @@ const docTemplate = `{
                 "phone": {
                     "type": "string"
                 },
-                "resetTime": {
+                "reset_time": {
                     "type": "integer"
                 },
                 "resources": {
@@ -1571,7 +1652,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/model.UserResource"
                     }
                 },
-                "secretCode": {
+                "secret_code": {
                     "type": "array",
                     "items": {
                         "type": "string"
