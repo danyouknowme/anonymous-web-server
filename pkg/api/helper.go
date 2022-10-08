@@ -82,8 +82,8 @@ func UpdateUserResetTimeOnMinute(user model.User) error {
 	return nil
 }
 
-func GetResourceByNameHelper(ctx context.Context, resourceName string) (resource model.Resource, err error) {
-	err = resourceCollection.FindOne(ctx, bson.M{"label": resourceName}).Decode(&resource)
+func GetResourceByLabelHelper(ctx context.Context, resourceLabel string) (resource model.Resource, err error) {
+	err = resourceCollection.FindOne(ctx, bson.M{"label": resourceLabel}).Decode(&resource)
 	if err != nil {
 		return
 	}
@@ -115,4 +115,15 @@ func GenerateBillNumberHelper(ctx context.Context) (billNumber string, err error
 	}
 
 	return orderCount, nil
+}
+
+func GeneratePlanRoutine(plan string) int64 {
+	switch plan {
+	case "MONTH":
+		return 30
+	case "YEAR":
+		return 365
+	default:
+		return -1
+	}
 }
