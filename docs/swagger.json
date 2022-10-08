@@ -434,6 +434,64 @@
                 }
             }
         },
+        "/api/v1/orders/confirmation": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Confirm order require admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Confirm order",
+                "operationId": "ConfirmOrder",
+                "parameters": [
+                    {
+                        "description": "Confirm order request to be updated",
+                        "name": "ConfirmOrderRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ConfirmOrderRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/resources": {
             "get": {
                 "description": "Get all resource information",
@@ -1197,6 +1255,17 @@
                     "type": "string"
                 },
                 "resource_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ConfirmOrderRequest": {
+            "type": "object",
+            "properties": {
+                "billno": {
+                    "type": "string"
+                },
+                "status": {
                     "type": "string"
                 }
             }

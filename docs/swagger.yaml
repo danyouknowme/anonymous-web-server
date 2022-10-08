@@ -41,6 +41,13 @@ definitions:
       resource_name:
         type: string
     type: object
+  model.ConfirmOrderRequest:
+    properties:
+      billno:
+        type: string
+      status:
+        type: string
+    type: object
   model.CreateUserRequest:
     properties:
       email:
@@ -671,6 +678,43 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Add order
+      tags:
+      - orders
+  /api/v1/orders/confirmation:
+    post:
+      consumes:
+      - application/json
+      description: Confirm order require admin
+      operationId: ConfirmOrder
+      parameters:
+      - description: Confirm order request to be updated
+        in: body
+        name: ConfirmOrderRequest
+        required: true
+        schema:
+          $ref: '#/definitions/model.ConfirmOrderRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Confirm order
       tags:
       - orders
   /api/v1/resources:
