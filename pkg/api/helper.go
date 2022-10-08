@@ -2,7 +2,11 @@ package api
 
 import (
 	"context"
+	"fmt"
+	"strconv"
+	"strings"
 	"time"
+	"unicode/utf8"
 
 	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/gin-gonic/gin"
@@ -76,4 +80,39 @@ func UpdateUserResetTimeOnMinute(user model.User) error {
 	}
 
 	return nil
+}
+
+func GetResourceByNameHelper(ctx context.Context, resourceName string) (resource model.Resource, err error) {
+	err = resourceCollection.FindOne(ctx, bson.M{"label": resourceName}).Decode(&resource)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func FindPlanHelper(requestPlan string, resource model.Resource) (plan model.Plan, err error) {
+	for _, p := range resource.Plan {
+		if p.Name == requestPlan {
+			return p, nil
+		}
+	}
+	err = fmt.Errorf("plan %s not found in resource %s", requestPlan, resource.Label)
+	return plan, err
+}
+
+func GenerateBillNumberHelper(ctx context.Context) (billNumber string, err error) {
+	m := 6
+	c := "0"
+
+	count, err := orderCollection.CountDocuments(ctx, bson.M{})
+	if err != nil {
+		return "", err
+	}
+	orderCount := strconv.FormatInt(count+1, 10)
+
+	if n := utf8.RuneCountInString(orderCount); n < m {
+		orderCount = strings.Repeat(c, m-n) + orderCount
+	}
+
+	return orderCount, nil
 }
