@@ -48,3 +48,14 @@ type ForgotPasswordRequest struct {
 	NewPassword string `json:"new_password" bson:"new_password"`
 	SecretCode  string `json:"secret_code" bson:"secret_code"`
 }
+
+type AddOrderRequest struct {
+	Username         string                 `json:"username" bson:"username"`
+	RequestOrder     []RequestOrderResource `json:"request_order" bson:"request_order"`
+	TransactionImage string                 `json:"transaction_image" bson:"transaction_image"`
+}
+
+type RequestOrderResource struct {
+	Resource string `json:"resource" bson:"resource"`
+	Plan     string `json:"plan" bson:"plan"`
+}
