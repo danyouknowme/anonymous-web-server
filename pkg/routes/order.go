@@ -12,4 +12,5 @@ func OrderRoute(version *gin.RouterGroup) {
 
 	authAndAdminOrders := orders.Use(api.AuthAndAdminMiddleWare())
 	authAndAdminOrders.GET("", api.GetAllOrders())
+	authAndAdminOrders.POST("/confirmation", api.ConfirmOrder())
 }

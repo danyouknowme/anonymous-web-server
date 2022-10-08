@@ -59,3 +59,8 @@ type RequestOrderResource struct {
 	Resource string `json:"resource" bson:"resource"`
 	Plan     string `json:"plan" bson:"plan"`
 }
+
+type ConfirmOrderRequest struct {
+	BillNumber string `json:"billno" bson:"billno"`
+	Status     string `json:"status" bson:"status"`
+}
