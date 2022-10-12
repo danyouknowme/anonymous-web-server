@@ -161,6 +161,7 @@ func ConfirmOrder() gin.HandlerFunc {
 		var req model.ConfirmOrderRequest
 		var order model.Order
 		var user model.User
+		var benefits []model.Benefit
 		defer cancel()
 
 		if err := c.BindJSON(&req); err != nil {
@@ -211,6 +212,12 @@ func ConfirmOrder() gin.HandlerFunc {
 					Status:  nil,
 				}
 				newUserResources = append(newUserResources, newResource)
+
+				newBenefits := model.Benefit{
+					ResourceName: rs.ResourceName,
+					Price:        rs.Price,
+				}
+				benefits = append(benefits, newBenefits)
 			}
 		}
 
@@ -221,6 +228,12 @@ func ConfirmOrder() gin.HandlerFunc {
 		}
 
 		_, err = userCollection.UpdateOne(ctx, bson.M{"username": order.Username}, bson.M{"$set": bson.M{"resources": newUserResources}})
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, errorResponse(err))
+			return
+		}
+
+		err = UpdatePartnerBenefitsHelper(ctx, benefits)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
 			return

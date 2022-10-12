@@ -14,6 +14,7 @@ var userCollection *mongo.Collection = database.GetCollection(database.DB, "user
 var resourceCollection *mongo.Collection = database.GetCollection(database.DB, "resources")
 var downloadCollection *mongo.Collection = database.GetCollection(database.DB, "downloads")
 var orderCollection *mongo.Collection = database.GetCollection(database.DB, "orders")
+var benefitCollection *mongo.Collection = database.GetCollection(database.DB, "benefits")
 
 func messageResponse(message string) model.MessageResponse {
 	response := model.MessageResponse{

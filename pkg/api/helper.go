@@ -11,6 +11,7 @@ import (
 	"github.com/danyouknowme/awayfromus/pkg/model"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func VerifyUserAdmin(ctx *gin.Context, username string) (bool, error) {
@@ -126,4 +127,25 @@ func GeneratePlanRoutine(plan string) int64 {
 	default:
 		return -1
 	}
+}
+
+func UpdatePartnerBenefitsHelper(ctx context.Context, benefits []model.Benefit) error {
+	for _, bn := range benefits {
+		var benefit model.Benefit
+		err := benefitCollection.FindOne(ctx, bson.M{"resource_name": bn.ResourceName}).Decode(&benefit)
+		if err != nil && err == mongo.ErrNoDocuments {
+			_, err = benefitCollection.InsertOne(ctx, bn)
+			if err != nil {
+				return err
+			}
+			continue
+		}
+
+		result := benefitCollection.FindOneAndUpdate(ctx, bson.M{"resource_name": benefit.ResourceName}, bson.M{"$set": bson.M{"price": benefit.Price + bn.Price}})
+		if result.Err() != nil {
+			return result.Err()
+		}
+	}
+
+	return nil
 }
