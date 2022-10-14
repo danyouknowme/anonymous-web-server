@@ -49,6 +49,7 @@ func main() {
 	routes.UserRoute(v1)
 	routes.OrderRoute(v1)
 	routes.BenefitRoute(v1)
+	routes.PaymentRoute(v1)
 
 	app.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
