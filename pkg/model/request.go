@@ -64,3 +64,7 @@ type ConfirmOrderRequest struct {
 	BillNumber string `json:"billno" bson:"billno"`
 	Status     string `json:"status" bson:"status"`
 }
+
+type ClearPartnerBenefitRequest struct {
+	ResourceName string `json:"resource_name" bson:"resource_name"`
+}
