@@ -788,6 +788,28 @@ paths:
       summary: Confirm order
       tags:
       - orders
+  /api/v1/payments:
+    get:
+      description: Get payment history of user
+      operationId: GetPaymentHistory
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Order'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get payment history
+      tags:
+      - payments
   /api/v1/resources:
     get:
       description: Get all resource information
