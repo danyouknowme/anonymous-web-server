@@ -34,10 +34,22 @@ definitions:
       thumbnail:
         type: string
     type: object
+  model.Benefit:
+    properties:
+      price:
+        type: number
+      resource_name:
+        type: string
+    type: object
   model.CheckLicenseRequest:
     properties:
       license:
         type: string
+      resource_name:
+        type: string
+    type: object
+  model.ClearPartnerBenefitRequest:
+    properties:
       resource_name:
         type: string
     type: object
@@ -481,6 +493,65 @@ paths:
       summary: Create user
       tags:
       - users
+  /api/v1/benefits:
+    get:
+      description: Get partner benefits
+      operationId: GetPartnerBenefits
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Benefit'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Get partner benefits
+      tags:
+      - benefits
+  /api/v1/benefits/clear:
+    post:
+      consumes:
+      - application/json
+      description: Clear partner benefit by resoure name
+      operationId: ClearPartnerBenefit
+      parameters:
+      - description: Resource name that need to update partner benefit
+        in: body
+        name: Download
+        required: true
+        schema:
+          $ref: '#/definitions/model.ClearPartnerBenefitRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.MessageResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.ErrorResponse'
+      security:
+      - ApiKeyAuth: []
+      summary: Clear partner benefit
+      tags:
+      - benefits
   /api/v1/downloads:
     post:
       consumes:

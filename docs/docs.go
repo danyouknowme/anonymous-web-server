@@ -131,6 +131,99 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/benefits": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Get partner benefits",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "benefits"
+                ],
+                "summary": "Get partner benefits",
+                "operationId": "GetPartnerBenefits",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.Benefit"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/benefits/clear": {
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Clear partner benefit by resoure name",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "benefits"
+                ],
+                "summary": "Clear partner benefit",
+                "operationId": "ClearPartnerBenefit",
+                "parameters": [
+                    {
+                        "description": "Resource name that need to update partner benefit",
+                        "name": "Download",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.ClearPartnerBenefitRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.MessageResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/downloads": {
             "post": {
                 "security": [
@@ -1254,12 +1347,31 @@ const docTemplate = `{
                 }
             }
         },
+        "model.Benefit": {
+            "type": "object",
+            "properties": {
+                "price": {
+                    "type": "number"
+                },
+                "resource_name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.CheckLicenseRequest": {
             "type": "object",
             "properties": {
                 "license": {
                     "type": "string"
                 },
+                "resource_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.ClearPartnerBenefitRequest": {
+            "type": "object",
+            "properties": {
                 "resource_name": {
                     "type": "string"
                 }
