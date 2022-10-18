@@ -504,7 +504,7 @@ func ForgotPassword() gin.HandlerFunc {
 			return
 		}
 
-		remainingSecretCode := util.RemoveSecretCode(user.SecretCode, req.SecretCode)
+		remainingSecretCode := util.Remove(user.SecretCode, req.SecretCode)
 		newPassword, err := util.HashPassword(req.NewPassword)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, errorResponse(err))
