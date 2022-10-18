@@ -4,4 +4,10 @@ server:
 swagger:
 	swag init --md ./
 
-.PHONY: server swagger
+test:
+	ginkgo -v --cover --coverprofile=coverage.out ./...
+
+coverage:
+	go tool cover -func coverage.out
+
+.PHONY: server swagger test coverage
