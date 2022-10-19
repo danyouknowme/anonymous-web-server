@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Test') {
             steps {
-                sh 'make test'
+                sh 'go test -v cover ./...'
             }
         }
     }
